@@ -54,7 +54,10 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  fonts :
+    - family: LineAwesome
+      fonts:
+          - asset: assets/fonts/la-solid-900.ttf
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -64,6 +67,7 @@ flutter:
       - assets/images/
       - assets/images/background/
       - assets/images/svg/bean.svg
+      - assets/images/social/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

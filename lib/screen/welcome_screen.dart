@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/screen/login_form_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -72,7 +73,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       // Logo Section
                       // Pindahkan logo ke atas dengan menggesernya ke atas menggunakan Transform
                       Transform.translate(
-                        offset: Offset(0, -100),
+                        offset: Offset(0, -110),
                         child: Column(
                           children: [
                             Stack(
@@ -127,6 +128,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 letterSpacing: 5,
                               ),
                             ),
+                            const SizedBox(height: 10,),
                             const Text(
                               "Coffee Shop App",
                               style: TextStyle(
@@ -193,7 +195,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   controller: _pageController,
                   count: pages.length,
                   effect: const ExpandingDotsEffect(
-                    activeDotColor: Color.fromRGBO(125, 91, 124, 1),
+                    activeDotColor: Color.fromRGBO(74, 55, 73, 1),
                     dotColor: Colors.black12,
                     dotHeight: 8,
                     dotWidth: 8,
@@ -207,14 +209,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(125, 91, 124, 1),
+                          backgroundColor: const Color.fromRGBO(74, 55, 73, 1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           minimumSize: const Size.fromHeight(50),
                         ),
+                        // Pastikan Anda telah mengimpor file login_form_screen.dart:
+                        // import 'package:project_kuliah_mwsp_uts_kel4/screen/login_form_screen.dart';
+
                         onPressed: () {
-                          // Arahkan ke halaman login
+                          showModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            isScrollControlled: true,
+                            builder: (context) => const LoginScreen(),
+                          );
                         },
                         child: const Text(
                           "LOGIN",
@@ -225,7 +235,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color.fromRGBO(255, 207, 167, 1),
-                          foregroundColor: Color.fromRGBO(125, 91, 124, 1),
+                          foregroundColor: Color.fromRGBO(74, 55, 73, 1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
