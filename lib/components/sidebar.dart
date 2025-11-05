@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/messages_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/notifications_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/order_reviews_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/reward_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/wishlist_screen.dart';
 
 class SideBar extends StatelessWidget {
   const SideBar({super.key});
@@ -89,7 +93,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Wishlist',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => WishlistScreen(),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
@@ -98,7 +107,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Notifications (2)',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotificationsPage(),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
@@ -148,7 +162,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Order Review',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OrderReviewsPage(),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
@@ -157,7 +176,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Message',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MessagesPage(),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
