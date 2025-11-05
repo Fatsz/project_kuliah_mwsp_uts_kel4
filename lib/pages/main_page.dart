@@ -494,25 +494,27 @@ class _MainPageState extends State<MainPage> {
             ],
           ),
           Positioned(
-            top: 85,
-            right: 55,
+            top: 80,
+            right: 10,
             child: Container(
+              width: 50,
+              height: 50,
               decoration: BoxDecoration(
                 color: Colors.white,
-                shape: BoxShape.circle,
+                borderRadius: BorderRadius.circular(15),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
-                    blurRadius: 6,
+                    blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
                 ],
               ),
               padding: const EdgeInsets.all(6),
               child: const Icon(
-                Icons.add_shopping_cart,
+                Icons.shopping_bag_outlined,
                 color: Color(0xFF4A3749),
-                size: 18,
+                size: 25,
               ),
             ),
           ),
