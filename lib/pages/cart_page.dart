@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'checkout_page.dart'; // 👉 import halaman checkout
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -11,7 +12,6 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
 
-  // Data dummy keranjang dengan gambar dari assets/images/cart/
   List<Map<String, dynamic>> allItems = [
     {
       "title": "Hot Sweet Indonesian Tea",
@@ -148,9 +148,15 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            // 👉 Navigasi ke halaman Checkout
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CheckoutPage()),
+            );
+          },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF3A2D46),
+            backgroundColor: const Color(0xFF3A2D46),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
