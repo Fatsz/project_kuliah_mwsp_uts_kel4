@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'forget_pass_screen.dart';
 import 'register_form_screen.dart';
-import 'reward_page.dart'; // tambahkan ini
+import 'package:project_kuliah_mwsp_uts_kel4/dummy/main_page_dummy.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -58,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen>
             onTap: () => Navigator.pop(context),
             child: Container(color: const Color.fromRGBO(74, 55, 73, 1)),
           ),
-
           Align(
             alignment: Alignment.bottomCenter,
             child: SlideTransition(
@@ -72,7 +71,6 @@ class _LoginScreenState extends State<LoginScreen>
                 ),
                 child: SingleChildScrollView(
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const Align(
@@ -94,6 +92,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 24),
 
+                      // Username
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -116,6 +115,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 16),
 
+                      // Password
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -130,7 +130,8 @@ class _LoginScreenState extends State<LoginScreen>
                         decoration: InputDecoration(
                           hintText: 'Password',
                           hintStyle: const TextStyle(
-                              color: Color.fromRGBO(74, 55, 73, 0.5)),
+                            color: Color.fromRGBO(74, 55, 73, 0.5),
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -147,19 +148,19 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 24),
 
-                      // Tombol LOGIN ke RewardsPage
+                      // Tombol LOGIN menuju MainPageDummy
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const RewardsPage()),
+                              builder: (context) => const HomePage(),
+                            ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
-                          backgroundColor:
-                              const Color.fromRGBO(74, 55, 73, 1),
+                          backgroundColor: const Color.fromRGBO(74, 55, 73, 1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(22),
                           ),
@@ -185,8 +186,7 @@ class _LoginScreenState extends State<LoginScreen>
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                                 minimumSize: const Size(0, 0),
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               child: const Text(
                                 "Forgot Password?",
@@ -209,8 +209,7 @@ class _LoginScreenState extends State<LoginScreen>
                               style: TextButton.styleFrom(
                                 padding: EdgeInsets.zero,
                                 minimumSize: const Size(0, 0),
-                                tapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
                               child: const Text(
                                 "Reset Password",
@@ -224,6 +223,7 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 30),
 
+                      // Sosial media login
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -245,20 +245,24 @@ class _LoginScreenState extends State<LoginScreen>
                         style: TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 16),
+
                       ElevatedButton(
                         onPressed: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const RegisterFormScreen(),
+                              builder: (context) => const RegisterFormScreen(),
                             ),
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
-                          backgroundColor:
-                              const Color.fromRGBO(229, 229, 229, 1),
+                          backgroundColor: const Color.fromRGBO(
+                            229,
+                            229,
+                            229,
+                            1,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(22),
                           ),
