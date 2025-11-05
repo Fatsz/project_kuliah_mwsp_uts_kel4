@@ -62,7 +62,10 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/images/avatar/
     - assets/images/background/
+    - assets/images/menus/
+    - assets/images/menus/slide/
     - assets/images/svg/
     - assets/images/svg/bean.svg
     - assets/images/svg/icons/
