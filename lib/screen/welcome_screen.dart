@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/screen/login_form_screen.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/screen/register_form_screen.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -17,17 +19,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     {
       'image': 'assets/images/background/bg1.jpg',
       'title': 'Start your morning\nwith great coffee',
-      'subtitle': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
+      'subtitle':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
     },
     {
       'image': 'assets/images/background/bg2.jpg',
       'title': 'Best coffee shop\nin this town',
-      'subtitle': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
+      'subtitle':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
     },
     {
       'image': 'assets/images/background/bg3.jpg',
       'title': 'Taste from the\ngood old days',
-      'subtitle': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
+      'subtitle':
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
     },
   ];
 
@@ -58,9 +63,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
-                        end: Alignment(0, 0.3),
+                      end: Alignment(0, 0.3),
                       colors: [
-                        Colors.white.withOpacity(0.15), // ringan semi transparan di atas
+                        Colors.white.withOpacity(
+                          0.15,
+                        ), // ringan semi transparan di atas
                         Colors.white.withOpacity(1), // tebal putih di bawah
                       ],
                     ),
@@ -72,7 +79,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       // Logo Section
                       // Pindahkan logo ke atas dengan menggesernya ke atas menggunakan Transform
                       Transform.translate(
-                        offset: Offset(0, -100),
+                        offset: Offset(0, -110),
                         child: Column(
                           children: [
                             Stack(
@@ -107,7 +114,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   bottom: -1,
                                   left: 10,
                                   child: Transform.rotate(
-                                    angle: 83 * 3.14159 / 180, // rotasi 83 derajat
+                                    angle:
+                                        83 * 3.14159 / 180, // rotasi 83 derajat
                                     child: Container(
                                       height: 25,
                                       width: 25,
@@ -127,6 +135,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 letterSpacing: 5,
                               ),
                             ),
+                            const SizedBox(height: 10),
                             const Text(
                               "Coffee Shop App",
                               style: TextStyle(
@@ -193,7 +202,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   controller: _pageController,
                   count: pages.length,
                   effect: const ExpandingDotsEffect(
-                    activeDotColor: Color.fromRGBO(125, 91, 124, 1),
+                    activeDotColor: Color.fromRGBO(74, 55, 73, 1),
                     dotColor: Colors.black12,
                     dotHeight: 8,
                     dotWidth: 8,
@@ -207,36 +216,58 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(125, 91, 124, 1),
+                          backgroundColor: const Color.fromRGBO(74, 55, 73, 1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           minimumSize: const Size.fromHeight(50),
                         ),
                         onPressed: () {
-                          // Arahkan ke halaman login
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => LoginScreen(),
+                            ),
+                          );
                         },
                         child: const Text(
                           "LOGIN",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color.fromRGBO(255, 255, 255, 1)),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color.fromRGBO(255, 255, 255, 1),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 15),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(255, 207, 167, 1),
-                          foregroundColor: Color.fromRGBO(125, 91, 124, 1),
+                          backgroundColor: const Color.fromRGBO(
+                            255,
+                            207,
+                            167,
+                            1,
+                          ),
+                          foregroundColor: const Color.fromRGBO(74, 55, 73, 1),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
                           minimumSize: const Size.fromHeight(50),
                         ),
                         onPressed: () {
-                          // Arahkan ke halaman sign up
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterFormScreen(),
+                            ),
+                          );
                         },
                         child: const Text(
                           "SIGN UP FOR FREE",
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ],
