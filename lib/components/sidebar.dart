@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:project_kuliah_mwsp_uts_kel4/screen/reward_page.dart';
-import 'package:project_kuliah_mwsp_uts_kel4/screen/wishlist_screen.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/reward_page.dart';
 
 class SideBar extends StatelessWidget {
   const SideBar({super.key});
