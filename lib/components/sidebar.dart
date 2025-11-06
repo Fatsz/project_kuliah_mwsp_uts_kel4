@@ -40,7 +40,9 @@ class SideBar extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color.fromARGB(255, 0, 0, 0)),
+                      border: Border.all(
+                        color: const Color.fromARGB(255, 0, 0, 0),
+                      ),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
@@ -95,9 +97,7 @@ class SideBar extends StatelessWidget {
                     title: 'Wishlist',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => WishlistScreen(),
-                      ),
+                      MaterialPageRoute(builder: (context) => WishlistScreen()),
                     ),
                   ),
                   _MenuItem(
@@ -141,9 +141,7 @@ class SideBar extends StatelessWidget {
                     title: 'Rewards',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => RewardsPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => RewardsPage()),
                     ),
                   ),
                   _MenuItem(
@@ -178,9 +176,7 @@ class SideBar extends StatelessWidget {
                     title: 'Message',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => MessagesPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => MessagesPage()),
                     ),
                   ),
                   _MenuItem(
@@ -212,7 +208,10 @@ class SideBar extends StatelessWidget {
                   ),
                   // Footer
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -226,7 +225,10 @@ class SideBar extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           'App Version 1.0.1',
-                          style: TextStyle(color: Color.fromRGBO(177, 177, 195, 1), fontSize: 12),
+                          style: TextStyle(
+                            color: Color.fromRGBO(177, 177, 195, 1),
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
@@ -258,7 +260,12 @@ class _MenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color selectedBg = const Color.fromRGBO(229, 218, 229, 1); // soft purple background
+    final Color selectedBg = const Color.fromRGBO(
+      229,
+      218,
+      229,
+      1,
+    ); // soft purple background
     final Color iconColor = selected
         ? Color.fromRGBO(74, 55, 73, 1)
         : Colors.grey.shade400;
@@ -266,7 +273,7 @@ class _MenuItem extends StatelessWidget {
         ? Color.fromRGBO(74, 55, 73, 1)
         : Colors.grey.shade600;
 
-  Widget leadingWidget;
+    Widget leadingWidget;
     if (leading != null) {
       leadingWidget = leading!;
     } else if (icon != null) {
