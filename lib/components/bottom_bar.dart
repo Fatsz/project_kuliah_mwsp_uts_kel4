@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/profile_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/reward_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/cart_page.dart';
 
@@ -43,6 +44,16 @@ class _BottomNavOverlayState extends State<BottomNavOverlay> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const RewardsPage()),
+      ).then((_) {
+        setState(() {
+          _selectedIndex = 0; // balik ke Home icon aktif
+        });
+      });
+    } else if (index == 3) {
+      // Navigasi ke RewardsPage, dan reset ke Home setelah kembali
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfilePage()),
       ).then((_) {
         setState(() {
           _selectedIndex = 0; // balik ke Home icon aktif

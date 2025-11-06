@@ -5,6 +5,7 @@ import 'package:project_kuliah_mwsp_uts_kel4/pages/main_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/messages_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/notifications_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/order_reviews_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/profile_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/reward_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/wishlist_screen.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/setting_page.dart';
@@ -163,7 +164,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Profile',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
