@@ -5,7 +5,9 @@ import 'package:project_kuliah_mwsp_uts_kel4/pages/main_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/messages_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/notifications_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/order_reviews_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/product_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/reward_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/tracking_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/wishlist_screen.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/setting_page.dart'; // ⬅️ tambahkan import ini
 import 'package:project_kuliah_mwsp_uts_kel4/screen/welcome_screen.dart';
@@ -82,7 +84,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Search Menu',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProductPage(categoryName: "Beverages"),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
@@ -140,7 +147,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Delivery Tracking',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TrackingPage(),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(

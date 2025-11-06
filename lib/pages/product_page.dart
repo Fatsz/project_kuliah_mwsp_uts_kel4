@@ -94,17 +94,6 @@ class _ProductPageState extends State<ProductPage>
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
                       child: const Icon(
                         Icons.arrow_back_rounded,
                         color: Colors.black,
@@ -129,17 +118,6 @@ class _ProductPageState extends State<ProductPage>
                         },
                         child: Container(
                           padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 6,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
                           child: const Icon(
                             Icons.more_vert_rounded,
                             color: Colors.black,

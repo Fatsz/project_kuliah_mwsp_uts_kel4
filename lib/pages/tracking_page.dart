@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/components/sidebar.dart';
 
 class TrackingPage extends StatelessWidget {
   const TrackingPage({super.key});
@@ -11,9 +12,19 @@ class TrackingPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
+        leading: InkWell(
+          borderRadius: BorderRadius.circular(50),
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(8),
+            child: const Icon(
+              Icons.arrow_back_rounded,
+              color: Colors.black,
+              size: 22,
+            ),
+          ),
         ),
         actions: [
           const Padding(
@@ -29,12 +40,18 @@ class TrackingPage extends StatelessWidget {
               ),
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Builder(
+              builder: (context) => IconButton(
+                icon: const Icon(Icons.more_vert, color: Colors.black87),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
+            ),
           ),
         ],
       ),
+      drawer: const SideBar(),
 
       // === BODY ===
       body: Stack(

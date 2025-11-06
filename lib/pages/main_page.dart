@@ -88,21 +88,32 @@ class _MainPageState extends State<MainPage> {
                   // ===== PROMOTION SECTION =====
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "Promotion",
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromRGBO(34, 34, 34, 1),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(34, 34, 34, 1),
+                          ),
                         ),
-                      ),
-                      Text(
-                        "More",
-                        style: TextStyle(
+                        InkWell(
+                        onTap: () {
+                          Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                              ProductPage(categoryName: 'All'),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "More",
+                          style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                           color: Color.fromRGBO(74, 55, 73, 1),
+                          ),
                         ),
                       ),
                     ],
