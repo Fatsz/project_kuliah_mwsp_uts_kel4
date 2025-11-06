@@ -58,7 +58,10 @@ class TrackingPage extends StatelessWidget {
         children: [
           // MAP diganti gambar statis dari assets
           Positioned.fill(
-            child: Image.asset("assets/images/background/map.png", fit: BoxFit.cover),
+            child: Image.asset(
+              "assets/images/background/map.png",
+              fit: BoxFit.cover,
+            ),
           ),
 
           // FOREGROUND CONTENT
@@ -205,12 +208,12 @@ class TrackingPage extends StatelessWidget {
                           width: 45,
                           height: 45,
                           decoration: const BoxDecoration(
-                            color: Color(0xFFEDE0D4),
+                            color: Color(0xFFE5DAE5),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.location_on_outlined,
-                            color: Color(0xFF795548),
+                            color: Color(0xFF6C5B6B),
                             size: 24,
                           ),
                         ),
