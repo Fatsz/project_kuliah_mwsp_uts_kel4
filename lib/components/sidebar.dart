@@ -5,11 +5,10 @@ import 'package:project_kuliah_mwsp_uts_kel4/pages/main_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/messages_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/notifications_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/order_reviews_page.dart';
-import 'package:project_kuliah_mwsp_uts_kel4/pages/product_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/reward_page.dart';
-import 'package:project_kuliah_mwsp_uts_kel4/pages/tracking_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/wishlist_screen.dart';
-import 'package:project_kuliah_mwsp_uts_kel4/pages/setting_page.dart'; // ⬅️ tambahkan import ini
+import 'package:project_kuliah_mwsp_uts_kel4/pages/setting_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/elements_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/screen/welcome_screen.dart';
 
 class SideBar extends StatelessWidget {
@@ -24,7 +23,7 @@ class SideBar extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // === HEADER ===
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Row(
@@ -39,7 +38,6 @@ class SideBar extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  // Close button in a bordered circle
                   Container(
                     width: 22,
                     height: 22,
@@ -59,7 +57,7 @@ class SideBar extends StatelessWidget {
               ),
             ),
 
-            // Menu list
+            // === MENU LIST ===
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 2),
@@ -84,12 +82,7 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Search Menu',
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ProductPage(categoryName: "Beverages"),
-                      ),
-                    ),
+                    onTap: () => Navigator.pop(context),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
@@ -147,12 +140,7 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Delivery Tracking',
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TrackingPage(),
-                      ),
-                    ),
+                    onTap: () => Navigator.pop(context),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
@@ -205,6 +193,7 @@ class SideBar extends StatelessWidget {
                       ),
                     ),
                   ),
+                  // ✅ ElementsPage route sudah benar
                   _MenuItem(
                     leading: SvgPicture.asset(
                       'assets/images/svg/icons/elements_icon.svg',
@@ -212,10 +201,13 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Elements',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ElementPage(),
+                      ),
+                    ),
                   ),
-
-                  // 🛠️ Setting Page (ini yang diperbaiki)
                   _MenuItem(
                     leading: SvgPicture.asset(
                       'assets/images/svg/icons/setting_icon.svg',
@@ -230,7 +222,6 @@ class SideBar extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   _MenuItem(
                     leading: SvgPicture.asset(
                       'assets/images/svg/icons/logout_icon.svg',
@@ -239,7 +230,7 @@ class SideBar extends StatelessWidget {
                     ),
                     title: 'Logout',
                     onTap: () {
-                      Navigator.pop(context); // close drawer
+                      Navigator.pop(context); // Close drawer
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
@@ -250,7 +241,7 @@ class SideBar extends StatelessWidget {
                     },
                   ),
 
-                  // Footer
+                  // === FOOTER ===
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -287,6 +278,7 @@ class SideBar extends StatelessWidget {
   }
 }
 
+// === MENU ITEM COMPONENT ===
 class _MenuItem extends StatelessWidget {
   final IconData? icon;
   final Widget? leading;
