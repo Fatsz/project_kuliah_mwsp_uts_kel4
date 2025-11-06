@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/components/sidebar.dart';
+import 'checkout_page.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -11,7 +13,6 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
 
-  // Data dummy keranjang dengan gambar dari assets/images/cart/
   List<Map<String, dynamic>> allItems = [
     {
       "title": "Hot Sweet Indonesian Tea",
@@ -25,21 +26,49 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
       "price": 8.6,
       "qty": 1,
       "image": "assets/images/cart/pic2.jpg",
+      "status": "all",
+    },
+    {
+      "title": "Hot Sweet Indonesian Tea",
+      "price": 5.8,
+      "qty": 2,
+      "image": "assets/images/cart/pic3.jpg",
+      "status": "all",
+    },
+    {
+      "title": "Caramel Latte Classic",
+      "price": 7.5,
+      "qty": 1,
+      "image": "assets/images/cart/pic4.jpg",
+      "status": "all",
+    },
+    {
+      "title": "Espresso Bold Roast",
+      "price": 6.2,
+      "qty": 1,
+      "image": "assets/images/cart/pic1.jpg",
       "status": "delivery",
     },
     {
-      "title": "Cappuccino Classic",
-      "price": 7.5,
+      "title": "Cold Brew Signature",
+      "price": 8.4,
+      "qty": 2,
+      "image": "assets/images/cart/pic2.jpg",
+      "status": "delivery",
+    },
+    {
+      "title": "Matcha Latte Creamy",
+      "price": 9.8,
       "qty": 1,
       "image": "assets/images/cart/pic3.jpg",
       "status": "done",
     },
     {
-      "title": "Latte Caramel Delight",
-      "price": 6.2,
-      "qty": 2,
+      "title": "Hazelnut Iced Coffee",
+      "price": 10.2,
+      "qty": 1,
       "image": "assets/images/cart/pic4.jpg",
-      "status": "all",
+      "status": "done",
     },
   ];
 
@@ -56,7 +85,9 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
       bool matchesSearch = item["title"].toString().toLowerCase().contains(
         searchQuery.toLowerCase(),
       );
-      bool matchesTab = status == "all" ? true : item["status"] == status;
+      bool matchesTab = status == "all"
+          ? item["status"] == "all"
+          : item["status"] == status;
       return matchesSearch && matchesTab;
     }).toList();
   }
@@ -64,16 +95,50 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const SideBar(), // ✅ Tambahkan sidebar di sini
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Cart", style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.more_vert)),
-        ],
+        automaticallyImplyLeading: false,
+        title: Builder(
+          builder: (context) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // 🔹 Tombol Back
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: const Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                  size: 26,
+                ),
+              ),
+
+              // 🔹 Judul Cart di tengah
+              const Text(
+                "Cart",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+
+              // 🔹 Ikon titik tiga di kanan untuk buka sidebar
+              GestureDetector(
+                onTap: () => Scaffold.of(context).openDrawer(),
+                child: const Icon(
+                  Icons.more_vert,
+                  color: Colors.black,
+                  size: 26,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
+
       body: Column(
         children: [
           // 🔹 Search Bar
@@ -130,27 +195,32 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
           const SizedBox(height: 10),
 
-          // 🔹 List isi keranjang berdasarkan tab
+          // 🔹 List isi keranjang + note
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
-                buildCartList("all"),
-                buildCartList("delivery"),
-                buildCartList("done"),
+                buildCartListWithNote("all"),
+                buildCartListWithNote("delivery"),
+                buildCartListWithNote("done"),
               ],
             ),
           ),
         ],
       ),
 
-      // 🔹 Floating “Place Order” button
+      // 🔹 Tombol “Place Order”
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CheckoutPage()),
+            );
+          },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF3A2D46),
+            backgroundColor: const Color(0xFF3A2D46),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
@@ -165,18 +235,47 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
     );
   }
 
-  // 🔹 Widget daftar item keranjang
-  Widget buildCartList(String status) {
+  Widget buildCartListWithNote(String status) {
     var items = getFilteredItems(status);
 
     if (items.isEmpty) {
       return const Center(child: Text("Nothing found"));
     }
 
-    return ListView.builder(
-      itemCount: items.length,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+    return ListView.separated(
+      itemCount: items.length + 1,
+      separatorBuilder: (context, index) => index < items.length
+          ? const Divider(color: Color(0xFFE0E0E0), height: 1)
+          : const SizedBox.shrink(),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemBuilder: (context, index) {
+        if (index == items.length) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 8, left: 4),
+            child: RichText(
+              text: const TextSpan(
+                children: [
+                  TextSpan(
+                    text: "Note: ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  TextSpan(
+                    text: "-Swipe to delete Cart Items",
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
         final item = items[index];
         return Dismissible(
           key: Key(item["title"]),
@@ -200,31 +299,32 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
             child: const Icon(Icons.delete, color: Colors.white),
           ),
           child: Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
+            margin: const EdgeInsets.symmetric(vertical: 10),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.05),
-                  blurRadius: 5,
-                  offset: const Offset(0, 2),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                   child: Image.asset(
                     item["image"],
-                    width: 70,
-                    height: 70,
+                    width: 95,
+                    height: 95,
                     fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 18),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,26 +332,38 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                       Text(
                         item["title"],
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        "\$${item["price"]}   x${item["qty"]}",
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "\$${item["price"]}",
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Text(
+                            "${item["qty"]}x",
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Text(
+                            "\$${(item["price"] * item["qty"]).toStringAsFixed(1)}",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                ),
-                Text(
-                  "\$${(item["price"] * item["qty"]).toStringAsFixed(1)}",
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
                   ),
                 ),
               ],

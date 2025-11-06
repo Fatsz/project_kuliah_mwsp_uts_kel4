@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/components/bottom_bar.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/detail_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/cart_page.dart';
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
   final String? profileImagePath;
   final String userName;
 
@@ -13,237 +16,262 @@ class MainPage extends StatelessWidget {
   });
 
   @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  int _selectedIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ===== HEADER =====
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          // ===== KONTEN UTAMA =====
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                20,
+                20,
+                20,
+                100,
+              ), // kasih padding bawah biar gak ketutup bottom bar
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  // ===== HEADER =====
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        "Good Morning",
-                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Good Morning",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.userName,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromRGBO(34, 34, 34, 1),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
+                      Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: _buildProfileImage(),
+                          ),
+                          Positioned(
+                            right: 2,
+                            top: 2,
+                            child: Container(
+                              height: 10,
+                              width: 10,
+                              decoration: const BoxDecoration(
+                                color: Colors.orange,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // ===== PROMOTION SECTION =====
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
                       Text(
-                        userName,
-                        style: const TextStyle(
-                          fontSize: 20,
+                        "Promotion",
+                        style: TextStyle(
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Color.fromRGBO(34, 34, 34, 1),
                         ),
                       ),
-                    ],
-                  ),
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(50),
-                        child: _buildProfileImage(),
-                      ),
-                      Positioned(
-                        right: 2,
-                        top: 2,
-                        child: Container(
-                          height: 10,
-                          width: 10,
-                          decoration: const BoxDecoration(
-                            color: Colors.orange,
-                            shape: BoxShape.circle,
-                          ),
+                      Text(
+                        "More",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color.fromRGBO(74, 55, 73, 1),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
+                  const SizedBox(height: 15),
 
-              const SizedBox(height: 30),
+                  // ===== PROMO SWIPER =====
+                  SizedBox(
+                    height: 185,
+                    child: PageView(
+                      controller: PageController(viewportFraction: 0.9),
+                      children: [
+                        _buildPromoCard(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF4A3749), Color(0xFF24182E)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          title: "Hot Mocha\nCappuccino Latte",
+                          price: "\$5.8",
+                          oldPrice: "\$9.9",
+                          image: "assets/images/background/pic1.png",
+                        ),
+                        _buildPromoCard(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFFF5F5F), Color(0xFFFF0000)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          title: "Hot Sweet\nIndonesian Tea",
+                          price: "\$2.5",
+                          oldPrice: "\$5.4",
+                          image: "assets/images/background/pic2.png",
+                        ),
+                        _buildPromoCard(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF4A3749), Color(0xFF24182E)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          title: "Espresso\nBold Edition",
+                          price: "\$4.2",
+                          oldPrice: "\$6.0",
+                          image: "assets/images/background/pic1.png",
+                        ),
+                      ],
+                    ),
+                  ),
 
-              // ===== PROMOTION SECTION =====
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Promotion",
+                  const SizedBox(height: 30),
+
+                  // ===== CATEGORY SECTION =====
+                  const Text(
+                    "Categories",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Color.fromRGBO(34, 34, 34, 1),
                     ),
                   ),
-                  Text(
-                    "More",
+                  const SizedBox(height: 15),
+
+                  SizedBox(
+                    height: 150,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        _buildCategoryCard(
+                          svgPath: "assets/images/svg/kopi.svg",
+                          title: "Beverages",
+                          subtitle: "67 Menus",
+                        ),
+                        _buildCategoryCard(
+                          svgPath: "assets/images/svg/burger.svg",
+                          title: "Foods",
+                          subtitle: "23 Menus",
+                        ),
+                        _buildCategoryCard(
+                          svgPath: "assets/images/svg/pizza.svg",
+                          title: "Pizza",
+                          subtitle: "16 Menus",
+                        ),
+                        _buildCategoryCard(
+                          svgPath: "assets/images/svg/drink.svg",
+                          title: "Drink",
+                          subtitle: "18 Menus",
+                        ),
+                        _buildCategoryCard(
+                          svgPath: "assets/images/svg/lunch.svg",
+                          title: "Lunch",
+                          subtitle: "45 Menus",
+                        ),
+                        _buildCategoryCard(
+                          svgPath: "assets/images/svg/burger.svg",
+                          title: "Burger",
+                          subtitle: "12 Menus",
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  // ===== FEATURED BEVERAGES =====
+                  const Text(
+                    "Featured Beverages",
                     style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color.fromRGBO(74, 55, 73, 1),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromRGBO(34, 34, 34, 1),
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+
+                  SizedBox(
+                    height: 240,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        _buildFeaturedCard(
+                          image: "assets/images/menus/slide/pic1.jpg",
+                          category: "Tea",
+                          name: "Hot Sweet Indonesian Tea",
+                          price: "\$5.8",
+                          rating: 4.0,
+                        ),
+                        _buildFeaturedCard(
+                          image: "assets/images/menus/slide/pic2.jpg",
+                          category: "Coffee",
+                          name: "Mocha Coffee Creamy Milky",
+                          price: "\$6.2",
+                          rating: 4.5,
+                        ),
+                        _buildFeaturedCard(
+                          image: "assets/images/menus/slide/pic3.jpg",
+                          category: "Tea",
+                          name: "Iced Lemon Tea Fresh",
+                          price: "\$4.0",
+                          rating: 4.2,
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 15),
-
-              // ===== PROMO SWIPER =====
-              SizedBox(
-                height: 185,
-                child: PageView(
-                  controller: PageController(viewportFraction: 0.9),
-                  children: [
-                    _buildPromoCard(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF4A3749), Color(0xFF24182E)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      title: "Hot Mocha\nCappuccino Latte",
-                      price: "\$5.8",
-                      oldPrice: "\$9.9",
-                      image: "assets/images/background/pic1.png",
-                    ),
-                    _buildPromoCard(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFFF5F5F), Color(0xFFFF0000)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      title: "Hot Sweet\nIndonesian Tea",
-                      price: "\$2.5",
-                      oldPrice: "\$5.4",
-                      image: "assets/images/background/pic2.png",
-                    ),
-                    _buildPromoCard(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF4A3749), Color(0xFF24182E)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      title: "Espresso\nBold Edition",
-                      price: "\$4.2",
-                      oldPrice: "\$6.0",
-                      image: "assets/images/background/pic1.png",
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // ===== CATEGORY SECTION =====
-              const Text(
-                "Categories",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(34, 34, 34, 1),
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              SizedBox(
-                height: 150,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _buildCategoryCard(
-                      svgPath: "assets/images/svg/kopi.svg",
-                      title: "Beverages",
-                      subtitle: "67 Menus",
-                    ),
-                    _buildCategoryCard(
-                      svgPath: "assets/images/svg/burger.svg",
-                      title: "Foods",
-                      subtitle: "23 Menus",
-                    ),
-                    _buildCategoryCard(
-                      svgPath: "assets/images/svg/pizza.svg",
-                      title: "Pizza",
-                      subtitle: "16 Menus",
-                    ),
-                    _buildCategoryCard(
-                      svgPath: "assets/images/svg/drink.svg",
-                      title: "Drink",
-                      subtitle: "18 Menus",
-                    ),
-                    _buildCategoryCard(
-                      svgPath: "assets/images/svg/lunch.svg",
-                      title: "Lunch",
-                      subtitle: "45 Menus",
-                    ),
-                    _buildCategoryCard(
-                      svgPath: "assets/images/svg/burger.svg",
-                      title: "Burger",
-                      subtitle: "12 Menus",
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 30),
-
-              // ===== FEATURED BEVERAGES =====
-              const Text(
-                "Featured Beverages",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(34, 34, 34, 1),
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              SizedBox(
-                height: 240,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    _buildFeaturedCard(
-                      image: "assets/images/menus/pic1.jpg",
-                      category: "Tea",
-                      name: "Hot Sweet Indonesian Tea",
-                      price: "\$5.8",
-                      rating: 4.0,
-                    ),
-                    _buildFeaturedCard(
-                      image: "assets/images/menus/pic2.jpg",
-                      category: "Coffee",
-                      name: "Mocha Coffee Creamy Milky",
-                      price: "\$6.2",
-                      rating: 4.5,
-                    ),
-                    _buildFeaturedCard(
-                      image: "assets/images/menus/pic3.jpg",
-                      category: "Tea",
-                      name: "Iced Lemon Tea Fresh",
-                      price: "\$4.0",
-                      rating: 4.2,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
 
-      // ===== NAVBAR BAWAH =====
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: const Color(0xFF4A3749),
-        unselectedItemColor: Colors.grey,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.coffee), label: ""),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ""),
+          // ===== FLOATING BOTTOM BAR =====
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: BottomNavOverlay(
+              selectedIndex: _selectedIndex,
+              onItemTapped: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -251,8 +279,9 @@ class MainPage extends StatelessWidget {
 
   // ===== FOTO PROFIL =====
   Widget _buildProfileImage() {
-    if (profileImagePath != null && profileImagePath!.isNotEmpty) {
-      final file = File(profileImagePath!);
+    if (widget.profileImagePath != null &&
+        widget.profileImagePath!.isNotEmpty) {
+      final file = File(widget.profileImagePath!);
       if (file.existsSync()) {
         return Image.file(file, height: 45, width: 45, fit: BoxFit.cover);
       }
@@ -375,117 +404,148 @@ class MainPage extends StatelessWidget {
     required String price,
     required double rating,
   }) {
-    return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: 15),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(16),
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        // Navigasi ke halaman detail
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const DetailPage()),
+        );
+      },
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 15),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child: Image.asset(
+                    image,
+                    height: 100,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
                 ),
-                child: Image.asset(
-                  image,
-                  height: 100,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      category,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      name,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.star, color: Colors.amber, size: 16),
-                            const SizedBox(width: 4),
-                            Text(
-                              rating.toStringAsFixed(1),
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ],
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        category,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w400,
                         ),
-                        Text(
-                          price,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF4A3749),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                color: Colors.amber,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                rating.toStringAsFixed(1),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
                           ),
+                          Text(
+                            price,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4A3749),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // ===== TOMBOL KERANJANG =====
+            Positioned(
+              top: 80,
+              right: 10,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(15),
+                  onTap: () {
+                    // Navigasi ke halaman keranjang
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CartPage()),
+                    );
+                  },
+                  child: Container(
+                    width: 55, // box agak besar
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
-                  ],
+                    padding: const EdgeInsets.all(8), // logo kecil, box besar
+                    child: const Icon(
+                      Icons.shopping_bag_outlined,
+                      color: Color(0xFF4A3749),
+                      size: 24, // ukuran icon kecil
+                    ),
+                  ),
                 ),
               ),
-            ],
-          ),
-          Positioned(
-            top: 85,
-            right: 55,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(6),
-              child: const Icon(
-                Icons.add_shopping_cart,
-                color: Color(0xFF4A3749),
-                size: 18,
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
