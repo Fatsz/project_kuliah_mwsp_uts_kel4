@@ -10,7 +10,7 @@ class DetailPage extends StatefulWidget {
 }
 
 class _DetailPageState extends State<DetailPage> {
-  int quantity = 0;
+  int quantity = 1;
   String selectedSize = 'MD';
   final double price = 5.8;
 
@@ -24,9 +24,13 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   void _scrollListener() {
-    if (_scrollController.offset > 60 && !isScrolled) {
+    if (_scrollController.hasClients &&
+        _scrollController.offset > 20 &&
+        !isScrolled) {
       setState(() => isScrolled = true);
-    } else if (_scrollController.offset <= 60 && isScrolled) {
+    } else if (_scrollController.hasClients &&
+        _scrollController.offset <= 20 &&
+        isScrolled) {
       setState(() => isScrolled = false);
     }
   }
@@ -44,237 +48,331 @@ class _DetailPageState extends State<DetailPage> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 250),
-          color: isScrolled ? Colors.white : Colors.transparent,
-          child: SafeArea(
-            child: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: isScrolled ? 1 : 0,
-              centerTitle: true,
-              leading: IconButton(
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: isScrolled ? Colors.black : Colors.white,
-                ),
-                onPressed: () => Navigator.pop(context),
-              ),
-              title: Text(
-                'Details',
-                style: TextStyle(
-                  color: isScrolled ? Colors.black : Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: Icon(
-                    Icons.bookmark_border,
-                    color: isScrolled ? Colors.black : Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        child: Column(
-          children: [
-            // Gambar header
-            Image.asset(
-              'assets/images/background/bg4.jpg',
-              height: MediaQuery.of(context).size.height * 0.45,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-
-            // Card putih konten
-            Container(
-              transform: Matrix4.translationValues(0, -25, 0),
-              width: double.infinity,
-              padding: const EdgeInsets.all(25),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, -8),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Creamy Latte Coffee',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim minim veniam',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 13, color: Colors.black54),
-                  ),
-                  const SizedBox(height: 25),
-
-                  // Tombol ukuran
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: ['SM', 'MD', 'LG', 'XL'].map((size) {
-                      bool isSelected = size == selectedSize;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() => selectedSize = size);
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 6),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 22,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFFFFE0B2)
-                                : const Color(0xFFF8F8F8),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: isSelected
-                                  ? Colors.orange
-                                  : Colors.transparent,
-                            ),
-                          ),
-                          child: Text(
-                            size,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              color: isSelected
-                                  ? Colors.black87
-                                  : Colors.grey.shade600,
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // Harga dan jumlah
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+        children: [
+          // ======== BACKGROUND ========
+          IgnorePointer(
+            child: Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.45,
+                  width: double.infinity,
+                  child: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            CupertinoIcons.tag_fill,
-                            color: Colors.orange,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            '\$${price.toStringAsFixed(1)}',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                      Image.asset(
+                        'assets/images/background/bg4.jpg',
+                        fit: BoxFit.cover,
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  if (quantity > 0) quantity--;
-                                });
-                              },
-                              child: const Icon(Icons.remove, size: 20),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                              ),
-                              child: Text(
-                                quantity.toString(),
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  quantity++;
-                                });
-                              },
-                              child: const Icon(Icons.add, size: 20),
-                            ),
-                          ],
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [Colors.black38, Colors.transparent],
+                          ),
                         ),
                       ),
                     ],
                   ),
+                ),
+                Expanded(child: Container(color: Colors.white)),
+              ],
+            ),
+          ),
 
-                  const SizedBox(height: 12),
-                  const Text(
-                    '*)Dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',
-                    style: TextStyle(fontSize: 11, color: Colors.grey),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 25),
+          // ======== KONTEN SCROLLABLE ========
+          NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              if (notification.metrics.pixels > 20 && !isScrolled) {
+                setState(() => isScrolled = true);
+              } else if (notification.metrics.pixels <= 20 && isScrolled) {
+                setState(() => isScrolled = false);
+              }
+              return true;
+            },
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.45),
 
-                  // Tombol Place Order
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CheckoutPage(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 15),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF3A2D46),
-                        borderRadius: BorderRadius.circular(14),
+                  // ======== KONTEN UTAMA ========
+                  Container(
+                    transform: Matrix4.translationValues(0, -35, 0),
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 22,
+                      vertical: 35,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(45),
+                        topRight: Radius.circular(45),
                       ),
-                      child: Center(
-                        child: Text(
-                          'PLACE ORDER  \$${totalPrice.toStringAsFixed(1)}',
-                          style: const TextStyle(
-                            color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 20,
+                          offset: const Offset(0, -6),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Creamy Latte Coffee',
+                          style: TextStyle(
+                            fontSize: 26,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
+                            letterSpacing: 0.5,
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 14),
+                        const Text(
+                          'Rich and creamy latte blended with aromatic espresso and fresh milk. Perfect for your coffee break.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: Colors.black54,
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 28),
+
+                        // ======== PILIHAN UKURAN ========
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: ['SM', 'MD', 'LG', 'XL'].map((size) {
+                            bool isSelected = size == selectedSize;
+                            return GestureDetector(
+                              onTap: () => setState(() => selectedSize = size),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 150),
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 25,
+                                  vertical: 25,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFFFFCFA7)
+                                      : const Color(0xFFFFEBDA),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Colors.orange
+                                        : Colors.transparent,
+                                  ),
+                                ),
+                                child: Text(
+                                  size,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 17,
+                                    color: isSelected
+                                        ? Colors.black
+                                        : Colors.grey.shade600,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                        const SizedBox(height: 35),
+
+                        // ======== HARGA & JUMLAH ========
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(CupertinoIcons.tag, size: 22),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '\$${price.toStringAsFixed(1)}',
+                                  style: const TextStyle(
+                                    fontSize: 25,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 14,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade300),
+                                borderRadius: BorderRadius.circular(22),
+                              ),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        if (quantity > 1) quantity--;
+                                      });
+                                    },
+                                    child: const Icon(Icons.remove, size: 20),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    child: Text(
+                                      quantity.toString(),
+                                      style: const TextStyle(fontSize: 17),
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        quantity++;
+                                      });
+                                    },
+                                    child: const Icon(Icons.add, size: 20),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+                        const Text(
+                          '*) Dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',
+                          style: TextStyle(
+                            fontSize: 17,
+                            color: Colors.grey,
+                            height: 1.3,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 35),
+
+                        // ======== TOMBOL PLACE ORDER ========
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const CheckoutPage(),
+                              ),
+                            );
+                          },
+                          child: AnimatedScale(
+                            scale: 1,
+                            duration: const Duration(milliseconds: 100),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF3A2D46), // Ungu tua
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.15),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: RichText(
+                                  text: TextSpan(
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1,
+                                      fontSize: 17,
+                                    ),
+                                    children: [
+                                      const TextSpan(
+                                        text: 'PLACE ORDER  ',
+                                        style: TextStyle(
+                                          color: Colors.white, // teks putih
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text:
+                                            '\$${totalPrice.toStringAsFixed(1)}',
+                                        style: const TextStyle(
+                                          color: Color(
+                                            0xFFD3C1E5,
+                                          ), // ungu muda lembut
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 50),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 40),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          // ======== APPBAR ========
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            height: kToolbarHeight + MediaQuery.of(context).padding.top,
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).padding.top,
+              left: 8,
+              right: 8,
+            ),
+            decoration: BoxDecoration(
+              color: isScrolled ? Colors.white : Colors.transparent,
+              boxShadow: isScrolled
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ]
+                  : [],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: isScrolled ? Colors.black : Colors.white,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                Text(
+                  'Details',
+                  style: TextStyle(
+                    color: isScrolled ? Colors.black : Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                Icon(
+                  Icons.bookmark_border,
+                  color: isScrolled ? Colors.black : Colors.white,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
