@@ -20,13 +20,15 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.offset > 40 && !isScrolled) {
-        setState(() => isScrolled = true);
-      } else if (_scrollController.offset <= 40 && isScrolled) {
-        setState(() => isScrolled = false);
-      }
-    });
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.offset > 60 && !isScrolled) {
+      setState(() => isScrolled = true);
+    } else if (_scrollController.offset <= 60 && isScrolled) {
+      setState(() => isScrolled = false);
+    }
   }
 
   @override
@@ -40,42 +42,50 @@ class _DetailPageState extends State<DetailPage> {
     double totalPrice = price * (quantity == 0 ? 1 : quantity);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: isScrolled ? Colors.white : Colors.transparent,
-        elevation: isScrolled ? 1 : 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: isScrolled ? Colors.black : Colors.white,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Details',
-          style: TextStyle(
-            color: isScrolled ? Colors.black : Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: Icon(
-              Icons.bookmark_border,
-              color: isScrolled ? Colors.black : Colors.white,
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          color: isScrolled ? Colors.white : Colors.transparent,
+          child: SafeArea(
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: isScrolled ? 1 : 0,
+              centerTitle: true,
+              leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: isScrolled ? Colors.black : Colors.white,
+                ),
+                onPressed: () => Navigator.pop(context),
+              ),
+              title: Text(
+                'Details',
+                style: TextStyle(
+                  color: isScrolled ? Colors.black : Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: Icon(
+                    Icons.bookmark_border,
+                    color: isScrolled ? Colors.black : Colors.white,
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
-
       body: SingleChildScrollView(
         controller: _scrollController,
         child: Column(
           children: [
-            // Background image
+            // Gambar header
             Image.asset(
               'assets/images/background/bg4.jpg',
               height: MediaQuery.of(context).size.height * 0.45,
@@ -83,7 +93,7 @@ class _DetailPageState extends State<DetailPage> {
               fit: BoxFit.cover,
             ),
 
-            // Card putih modern
+            // Card putih konten
             Container(
               transform: Matrix4.translationValues(0, -25, 0),
               width: double.infinity,
@@ -109,18 +119,15 @@ class _DetailPageState extends State<DetailPage> {
                     'Creamy Latte Coffee',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-
                   const SizedBox(height: 10),
-
                   const Text(
                     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim minim veniam',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 13, color: Colors.black54),
                   ),
-
                   const SizedBox(height: 25),
 
-                  // Size buttons
+                  // Tombol ukuran
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: ['SM', 'MD', 'LG', 'XL'].map((size) {
@@ -162,7 +169,7 @@ class _DetailPageState extends State<DetailPage> {
 
                   const SizedBox(height: 25),
 
-                  // Price and quantity
+                  // Harga dan jumlah
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -226,16 +233,14 @@ class _DetailPageState extends State<DetailPage> {
                   ),
 
                   const SizedBox(height: 12),
-
                   const Text(
                     '*)Dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore',
                     style: TextStyle(fontSize: 11, color: Colors.grey),
                     textAlign: TextAlign.center,
                   ),
-
                   const SizedBox(height: 25),
 
-                  // Place Order Button
+                  // Tombol Place Order
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -249,7 +254,7 @@ class _DetailPageState extends State<DetailPage> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       decoration: BoxDecoration(
-                        color: Colors.brown.shade700,
+                        color: Color(0xFF3A2D46),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Center(
@@ -264,7 +269,6 @@ class _DetailPageState extends State<DetailPage> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 40),
                 ],
               ),
