@@ -5,8 +5,11 @@ import 'package:project_kuliah_mwsp_uts_kel4/pages/main_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/messages_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/notifications_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/order_reviews_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/profile_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/reward_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/wishlist_screen.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/setting_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/pages/elements_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/screen/welcome_screen.dart';
 
 class SideBar extends StatelessWidget {
@@ -21,7 +24,7 @@ class SideBar extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
+            // === HEADER ===
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Row(
@@ -36,16 +39,13 @@ class SideBar extends StatelessWidget {
                       color: Colors.black,
                     ),
                   ),
-                  // Close button in a bordered circle (matching design)
                   Container(
                     width: 22,
                     height: 22,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: const Color.fromARGB(255, 0, 0, 0),
-                      ),
+                      border: Border.all(color: Colors.black),
                     ),
                     child: IconButton(
                       padding: EdgeInsets.zero,
@@ -58,7 +58,7 @@ class SideBar extends StatelessWidget {
               ),
             ),
 
-            // Menu list
+            // === MENU LIST ===
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 2),
@@ -73,9 +73,7 @@ class SideBar extends StatelessWidget {
                     selected: true,
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => MainPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => const MainPage()),
                     ),
                   ),
                   _MenuItem(
@@ -96,9 +94,7 @@ class SideBar extends StatelessWidget {
                     title: 'Shop Cart',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => CartPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => const CartPage()),
                     ),
                   ),
                   _MenuItem(
@@ -110,7 +106,9 @@ class SideBar extends StatelessWidget {
                     title: 'Wishlist',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => WishlistScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const WishlistScreen(),
+                      ),
                     ),
                   ),
                   _MenuItem(
@@ -123,7 +121,7 @@ class SideBar extends StatelessWidget {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => NotificationsPage(),
+                        builder: (context) => const NotificationsPage(),
                       ),
                     ),
                   ),
@@ -154,7 +152,9 @@ class SideBar extends StatelessWidget {
                     title: 'Rewards',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => RewardsPage()),
+                      MaterialPageRoute(
+                        builder: (context) => const RewardsPage(),
+                      ),
                     ),
                   ),
                   _MenuItem(
@@ -164,7 +164,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Profile',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ProfilePage(),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
@@ -176,7 +181,7 @@ class SideBar extends StatelessWidget {
                     onTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => OrderReviewsPage(),
+                        builder: (context) => const OrderReviewsPage(),
                       ),
                     ),
                   ),
@@ -189,9 +194,12 @@ class SideBar extends StatelessWidget {
                     title: 'Message',
                     onTap: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => MessagesPage()),
+                      MaterialPageRoute(
+                        builder: (context) => const MessagesPage(),
+                      ),
                     ),
                   ),
+                  // ✅ ElementsPage route sudah benar
                   _MenuItem(
                     leading: SvgPicture.asset(
                       'assets/images/svg/icons/elements_icon.svg',
@@ -199,7 +207,12 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Elements',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ElementPage(),
+                      ),
+                    ),
                   ),
                   _MenuItem(
                     leading: SvgPicture.asset(
@@ -208,9 +221,14 @@ class SideBar extends StatelessWidget {
                       height: 24,
                     ),
                     title: 'Setting',
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SettingPage(),
+                      ),
+                    ),
                   ),
-                    _MenuItem(
+                  _MenuItem(
                     leading: SvgPicture.asset(
                       'assets/images/svg/icons/logout_icon.svg',
                       width: 24,
@@ -218,15 +236,18 @@ class SideBar extends StatelessWidget {
                     ),
                     title: 'Logout',
                     onTap: () {
-                      Navigator.pop(context); // close drawer
+                      Navigator.pop(context); // Close drawer
                       Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => WelcomeScreen()),
-                      (route) => false,
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const WelcomeScreen(),
+                        ),
+                        (route) => false,
                       );
                     },
                   ),
-                  // Footer
+
+                  // === FOOTER ===
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
@@ -234,7 +255,7 @@ class SideBar extends StatelessWidget {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      children: const [
                         Text(
                           'Biji - Coffee Shop',
                           style: TextStyle(
@@ -242,7 +263,7 @@ class SideBar extends StatelessWidget {
                             color: Color.fromRGBO(177, 177, 195, 1),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'App Version 1.0.1',
                           style: TextStyle(
@@ -263,6 +284,7 @@ class SideBar extends StatelessWidget {
   }
 }
 
+// === MENU ITEM COMPONENT ===
 class _MenuItem extends StatelessWidget {
   final IconData? icon;
   final Widget? leading;
@@ -280,17 +302,12 @@ class _MenuItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color selectedBg = const Color.fromRGBO(
-      229,
-      218,
-      229,
-      1,
-    ); // soft purple background
+    final Color selectedBg = const Color.fromRGBO(229, 218, 229, 1);
     final Color iconColor = selected
-        ? Color.fromRGBO(74, 55, 73, 1)
+        ? const Color.fromRGBO(74, 55, 73, 1)
         : Colors.grey.shade400;
     final Color textColor = selected
-        ? Color.fromRGBO(74, 55, 73, 1)
+        ? const Color.fromRGBO(74, 55, 73, 1)
         : Colors.grey.shade600;
 
     Widget leadingWidget;

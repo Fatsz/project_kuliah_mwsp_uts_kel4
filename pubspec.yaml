@@ -37,6 +37,7 @@ dependencies:
   line_awesome_flutter: ^3.0.1
   flutter_svg: ^2.0.10+1
   smooth_page_indicator: ^1.1.0 
+  flutter_colorpicker: ^1.0.3
 
 dev_dependencies:
   flutter_test:
@@ -65,6 +66,7 @@ flutter:
     - assets/images/avatar/
     - assets/images/background/
     - assets/images/menus/
+    - assets/images/menus/list/
     - assets/images/menus/slide/
     - assets/images/svg/
     - assets/images/svg/bean.svg
