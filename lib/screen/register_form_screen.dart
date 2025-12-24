@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/screen/login_form_screen.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/user_service.dart';
 
 class RegisterFormScreen extends StatefulWidget {
   const RegisterFormScreen({super.key});
@@ -13,6 +14,9 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  final UserService _userService = UserService();
+  bool _isSubmitting = false;
 
   bool _obscurePassword = true;
 
@@ -46,6 +50,43 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
     setState(() {
       _obscurePassword = !_obscurePassword;
     });
+  }
+
+  Future<void> _submit() async {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Lengkapi semua field.')));
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      await _userService.createUser(
+        username: username,
+        email: email,
+        password: password,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Registrasi berhasil.')));
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Registrasi gagal: $e')));
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   @override
@@ -129,7 +170,9 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
                         controller: _emailController,
                         decoration: InputDecoration(
                           hintText: 'Email Address',
-                          hintStyle: TextStyle(color: Color.fromRGBO(74, 55, 73, 0.5)),
+                          hintStyle: TextStyle(
+                            color: Color.fromRGBO(74, 55, 73, 0.5),
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
                           ),
@@ -151,7 +194,9 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           hintText: 'Password',
-                          hintStyle: TextStyle(color: Color.fromRGBO(74, 55, 73, 0.5)),
+                          hintStyle: TextStyle(
+                            color: Color.fromRGBO(74, 55, 73, 0.5),
+                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -170,9 +215,7 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
 
                       // Tombol REGISTER
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: _isSubmitting ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                           backgroundColor: const Color.fromRGBO(74, 55, 73, 1),
@@ -180,14 +223,25 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
                             borderRadius: BorderRadius.circular(22),
                           ),
                         ),
-                        child: const Text(
-                          "REGISTER",
-                          style: TextStyle(
-                            fontSize: 16,
-                            letterSpacing: 1.5,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const Text(
+                                "REGISTER",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  letterSpacing: 1.5,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                       const SizedBox(height: 20),
 
