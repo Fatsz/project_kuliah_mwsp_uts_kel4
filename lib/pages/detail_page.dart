@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/checkout_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/models/product.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({super.key});
+  final Product product;
+  const DetailPage({super.key, required this.product});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -12,7 +14,7 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   int quantity = 1;
   String selectedSize = 'MD';
-  final double price = 5.8;
+  late final double price;
 
   final ScrollController _scrollController = ScrollController();
   bool isScrolled = false;
@@ -20,6 +22,7 @@ class _DetailPageState extends State<DetailPage> {
   @override
   void initState() {
     super.initState();
+    price = widget.product.price;
     _scrollController.addListener(_scrollListener);
   }
 
@@ -60,10 +63,15 @@ class _DetailPageState extends State<DetailPage> {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      Image.asset(
-                        'assets/images/background/bg4.jpg',
-                        fit: BoxFit.cover,
-                      ),
+                      widget.product.imageUrl.isNotEmpty
+                          ? Image.network(
+                              widget.product.imageUrl,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.asset(
+                              'assets/images/background/bg4.jpg',
+                              fit: BoxFit.cover,
+                            ),
                       Container(
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
@@ -123,19 +131,21 @@ class _DetailPageState extends State<DetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Creamy Latte Coffee',
-                          style: TextStyle(
+                        Text(
+                          widget.product.name,
+                          style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 0.5,
                           ),
                         ),
                         const SizedBox(height: 14),
-                        const Text(
-                          'Rich and creamy latte blended with aromatic espresso and fresh milk. Perfect for your coffee break.',
+                        Text(
+                          (widget.product.description.isNotEmpty)
+                              ? widget.product.description
+                              : 'No description available.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 17,
                             color: Colors.black54,
                             height: 1.5,

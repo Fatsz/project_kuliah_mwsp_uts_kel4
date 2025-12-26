@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/components/sidebar.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/detail_page.dart';
 import 'checkout_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/models/product.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/product_service.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -14,71 +16,39 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _searchController = TextEditingController();
 
-  List<Map<String, dynamic>> allItems = [
-    {
-      "title": "Hot Sweet Indonesian Tea",
-      "price": 5.8,
-      "qty": 2,
-      "image": "assets/images/cart/pic1.jpg",
-      "status": "all",
-    },
-    {
-      "title": "Mocha Coffee Creamy Milky",
-      "price": 8.6,
-      "qty": 1,
-      "image": "assets/images/cart/pic2.jpg",
-      "status": "all",
-    },
-    {
-      "title": "Hot Sweet Indonesian Tea",
-      "price": 5.8,
-      "qty": 2,
-      "image": "assets/images/cart/pic3.jpg",
-      "status": "all",
-    },
-    {
-      "title": "Caramel Latte Classic",
-      "price": 7.5,
-      "qty": 1,
-      "image": "assets/images/cart/pic4.jpg",
-      "status": "all",
-    },
-    {
-      "title": "Espresso Bold Roast",
-      "price": 6.2,
-      "qty": 1,
-      "image": "assets/images/cart/pic1.jpg",
-      "status": "delivery",
-    },
-    {
-      "title": "Cold Brew Signature",
-      "price": 8.4,
-      "qty": 2,
-      "image": "assets/images/cart/pic2.jpg",
-      "status": "delivery",
-    },
-    {
-      "title": "Matcha Latte Creamy",
-      "price": 9.8,
-      "qty": 1,
-      "image": "assets/images/cart/pic3.jpg",
-      "status": "done",
-    },
-    {
-      "title": "Hazelnut Iced Coffee",
-      "price": 10.2,
-      "qty": 1,
-      "image": "assets/images/cart/pic4.jpg",
-      "status": "done",
-    },
-  ];
+  List<Map<String, dynamic>> allItems = [];
 
   String searchQuery = "";
 
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
+    _loadCartFromBackend();
     super.initState();
+  }
+
+  Future<void> _loadCartFromBackend() async {
+    try {
+      final products = await ProductService().fetchProducts();
+      // Ambil beberapa produk sebagai contoh isi cart
+      final picked = products.take(6).toList();
+      setState(() {
+        allItems = picked
+            .map<Map<String, dynamic>>(
+              (p) => {
+                'title': p.name,
+                'price': p.price,
+                'qty': 1,
+                'image': p.imageUrl,
+                'status': 'all',
+                'product': p,
+              },
+            )
+            .toList();
+      });
+    } catch (e) {
+      // Biarkan kosong jika gagal
+    }
   }
 
   List<Map<String, dynamic>> getFilteredItems(String status) {
@@ -293,10 +263,15 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
           child: GestureDetector(
             onTap: () {
               // 👇 Navigasi ke halaman Detail
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DetailPage()),
-              );
+              final prod = item['product'] as Product?;
+              if (prod != null) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => DetailPage(product: prod),
+                  ),
+                );
+              }
             },
             child: Container(
               margin: const EdgeInsets.symmetric(vertical: 10),
@@ -317,12 +292,21 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(15),
-                    child: Image.asset(
-                      item["image"],
-                      width: 95,
-                      height: 95,
-                      fit: BoxFit.cover,
-                    ),
+                    child:
+                        (item["image"] is String &&
+                            (item["image"] as String).startsWith('http'))
+                        ? Image.network(
+                            item["image"],
+                            width: 95,
+                            height: 95,
+                            fit: BoxFit.cover,
+                          )
+                        : Image.asset(
+                            'assets/images/cart/pic1.jpg',
+                            width: 95,
+                            height: 95,
+                            fit: BoxFit.cover,
+                          ),
                   ),
                   const SizedBox(width: 18),
                   Expanded(

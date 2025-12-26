@@ -3,6 +3,8 @@ import 'package:project_kuliah_mwsp_uts_kel4/pages/main_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/components/sidebar.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/cart_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/detail_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/models/product.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/product_service.dart';
 
 class ProductPage extends StatefulWidget {
   final String categoryName;
@@ -18,8 +20,8 @@ class _ProductPageState extends State<ProductPage>
   TextEditingController searchController = TextEditingController();
   late TabController _tabController;
 
-  List<Map<String, dynamic>> allProducts = [];
-  List<Map<String, dynamic>> filteredProducts = [];
+  List<Product> allProducts = [];
+  List<Product> filteredProducts = [];
 
   List<String> categories = ["Beverages", "Brewed Coffee", "Blended Coffee"];
 
@@ -28,42 +30,30 @@ class _ProductPageState extends State<ProductPage>
     super.initState();
 
     _tabController = TabController(length: categories.length, vsync: this);
+    _loadProducts();
+  }
 
-    allProducts = [
-      {
-        'name': 'White Cream Cappuccino',
-        'price': 5.8,
-        'category': 'Coffee',
-        'image': 'assets/images/cart/pic1.jpg',
-      },
-      {
-        'name': 'Hot Cappuccino Latte with Mocha',
-        'price': 5.8,
-        'category': 'Coffee',
-        'image': 'assets/images/cart/pic2.jpg',
-      },
-      {
-        'name': 'Mocha Coffee Creamy Milky',
-        'price': 5.8,
-        'category': 'Coffee',
-        'image': 'assets/images/cart/pic3.jpg',
-      },
-      {
-        'name': 'Creamy Latte Coffee',
-        'price': 5.8,
-        'category': 'Coffee',
-        'image': 'assets/images/cart/pic4.jpg',
-      },
-    ];
-
-    filteredProducts = List.from(allProducts);
+  Future<void> _loadProducts() async {
+    try {
+      final products = await ProductService().fetchProducts();
+      setState(() {
+        allProducts = products;
+        filteredProducts = List<Product>.from(products);
+      });
+    } catch (e) {
+      // Bisa tambahkan snackbar/log jika perlu
+      setState(() {
+        allProducts = [];
+        filteredProducts = [];
+      });
+    }
   }
 
   void _searchProduct(String query) {
     setState(() {
       filteredProducts = allProducts
           .where(
-            (item) => item['name'].toLowerCase().contains(query.toLowerCase()),
+            (item) => item.name.toLowerCase().contains(query.toLowerCase()),
           )
           .toList();
     });
@@ -224,7 +214,8 @@ class _ProductPageState extends State<ProductPage>
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const DetailPage(),
+                                builder: (context) =>
+                                    DetailPage(product: product),
                               ),
                             );
                           },
@@ -250,12 +241,19 @@ class _ProductPageState extends State<ProductPage>
                                       borderRadius: const BorderRadius.vertical(
                                         top: Radius.circular(18),
                                       ),
-                                      child: Image.asset(
-                                        product['image'],
-                                        height: 120,
-                                        width: double.infinity,
-                                        fit: BoxFit.cover,
-                                      ),
+                                      child: product.imageUrl.isNotEmpty
+                                          ? Image.network(
+                                              product.imageUrl,
+                                              height: 120,
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Image.asset(
+                                              'assets/images/cart/pic1.jpg',
+                                              height: 120,
+                                              width: double.infinity,
+                                              fit: BoxFit.cover,
+                                            ),
                                     ),
                                     // ===== IKON KERANJANG =====
                                     Positioned(
@@ -306,7 +304,7 @@ class _ProductPageState extends State<ProductPage>
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        product['name'],
+                                        product.name,
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: const TextStyle(
@@ -317,7 +315,7 @@ class _ProductPageState extends State<ProductPage>
                                       ),
                                       const SizedBox(height: 3),
                                       Text(
-                                        product['category'],
+                                        product.category,
                                         style: const TextStyle(
                                           fontSize: 13,
                                           color: Colors.grey,
@@ -333,7 +331,7 @@ class _ProductPageState extends State<ProductPage>
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
-                                            "\$${product['price'].toStringAsFixed(1)}",
+                                            "\$${product.price.toStringAsFixed(1)}",
                                             style: const TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,

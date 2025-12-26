@@ -3,6 +3,7 @@ import 'forget_pass_screen.dart';
 import 'register_form_screen.dart';
 // import 'package:project_kuliah_mwsp_uts_kel4/dummy/main_page_dummy.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/main_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/user_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +17,8 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  final UserService _userService = UserService();
+  bool _isSubmitting = false;
   bool _obscurePassword = true;
 
   late AnimationController _controller;
@@ -47,6 +50,74 @@ class _LoginScreenState extends State<LoginScreen>
     setState(() {
       _obscurePassword = !_obscurePassword;
     });
+  }
+
+  Future<void> _submit() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Lengkapi semua field.')));
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final userData = await _userService.loginUser(
+        email: email,
+        password: password,
+      );
+
+      // Debug: print userData untuk melihat struktur response
+      print('User Data dari Login: $userData');
+
+      // Ambil username dari berbagai kemungkinan struktur JSON
+      String username = 'User';
+
+      // Cek apakah ada field 'username' langsung
+      if (userData.containsKey('username')) {
+        username = userData['username'] ?? 'User';
+      }
+      // Cek apakah ada nested object 'user' dengan field 'username'
+      else if (userData.containsKey('user') && userData['user'] is Map) {
+        final user = userData['user'] as Map<String, dynamic>;
+        username = user['username'] ?? 'User';
+      }
+      // Cek apakah ada nested object 'data' dengan field 'username'
+      else if (userData.containsKey('data') && userData['data'] is Map) {
+        final data = userData['data'] as Map<String, dynamic>;
+        username = data['username'] ?? 'User';
+      }
+
+      print('Username yang akan disimpan: $username');
+
+      // Simpan username dan email ke SharedPreferences
+      await _userService.saveUserData(username: username, email: email);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login berhasil. Selamat datang, $username!')),
+      );
+      
+      // Navigasi ke MainPage dengan membawa username
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainPage(userName: username),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Login gagal: $e')));
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   @override
@@ -151,14 +222,7 @@ class _LoginScreenState extends State<LoginScreen>
 
                       // Tombol LOGIN menuju MainPageDummy
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainPage(),
-                            ),
-                          );
-                        },
+                        onPressed: _isSubmitting ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                           backgroundColor: const Color.fromRGBO(74, 55, 73, 1),
@@ -166,14 +230,25 @@ class _LoginScreenState extends State<LoginScreen>
                             borderRadius: BorderRadius.circular(22),
                           ),
                         ),
-                        child: const Text(
-                          "LOGIN",
-                          style: TextStyle(
-                            fontSize: 16,
-                            letterSpacing: 1.5,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const Text(
+                                "LOGIN",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  letterSpacing: 1.5,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
 
                       const SizedBox(height: 10),
