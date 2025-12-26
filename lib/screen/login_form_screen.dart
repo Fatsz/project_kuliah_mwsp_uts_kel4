@@ -66,15 +66,48 @@ class _LoginScreenState extends State<LoginScreen>
     setState(() => _isSubmitting = true);
 
     try {
-      await _userService.loginUser(email: email, password: password);
+      final userData = await _userService.loginUser(
+        email: email,
+        password: password,
+      );
+
+      // Debug: print userData untuk melihat struktur response
+      print('User Data dari Login: $userData');
+
+      // Ambil username dari berbagai kemungkinan struktur JSON
+      String username = 'User';
+
+      // Cek apakah ada field 'username' langsung
+      if (userData.containsKey('username')) {
+        username = userData['username'] ?? 'User';
+      }
+      // Cek apakah ada nested object 'user' dengan field 'username'
+      else if (userData.containsKey('user') && userData['user'] is Map) {
+        final user = userData['user'] as Map<String, dynamic>;
+        username = user['username'] ?? 'User';
+      }
+      // Cek apakah ada nested object 'data' dengan field 'username'
+      else if (userData.containsKey('data') && userData['data'] is Map) {
+        final data = userData['data'] as Map<String, dynamic>;
+        username = data['username'] ?? 'User';
+      }
+
+      print('Username yang akan disimpan: $username');
+
+      // Simpan username dan email ke SharedPreferences
+      await _userService.saveUserData(username: username, email: email);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Login berhasil.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login berhasil. Selamat datang, $username!')),
+      );
+      
+      // Navigasi ke MainPage dengan membawa username
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const MainPage()),
+        MaterialPageRoute(
+          builder: (context) => MainPage(userName: username),
+        ),
       );
     } catch (e) {
       ScaffoldMessenger.of(

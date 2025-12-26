@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/components/bottom_bar.dart';
@@ -6,6 +7,9 @@ import 'package:project_kuliah_mwsp_uts_kel4/pages/detail_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/cart_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/product_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/notifications_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/models/product.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/product_service.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/user_service.dart';
 
 class MainPage extends StatefulWidget {
   final String? profileImagePath;
@@ -23,6 +27,55 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
+  List<Product> _featured = [];
+  String _username = 'Guest';
+  StreamSubscription<String>? _usernameSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts();
+    _loadUsername();
+    // Subscribe to real-time username changes
+    _usernameSub = UserService().usernameStream.listen((name) {
+      setState(() {
+        _username = (name.isEmpty) ? 'Guest' : name;
+      });
+    });
+  }
+
+  Future<void> _loadProducts() async {
+    try {
+      final products = await ProductService().fetchProducts();
+      setState(() {
+        _featured = products;
+      });
+    } catch (_) {
+      setState(() {
+        _featured = [];
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _usernameSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadUsername() async {
+    try {
+      final service = UserService();
+      final name = await service.getUsername();
+      setState(() {
+        _username = (name == null || name.isEmpty) ? 'Guest' : name;
+      });
+    } catch (_) {
+      setState(() {
+        _username = 'Guest';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +111,7 @@ class _MainPageState extends State<MainPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              widget.userName,
+                              _username,
                               style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -247,33 +300,17 @@ class _MainPageState extends State<MainPage> {
 
                   SizedBox(
                     height: 240,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        _buildFeaturedCard(
-                          image: "assets/images/menus/slide/pic1.jpg",
-                          category: "Tea",
-                          name: "Hot Sweet Indonesian Tea",
-                          price: "\$5.8",
-                          rating: 4.0,
-                        ),
-                        _buildFeaturedCard(
-                          image: "assets/images/menus/slide/pic2.jpg",
-                          category: "Coffee",
-                          name: "Mocha Coffee Creamy Milky",
-                          price: "\$6.2",
-                          rating: 4.5,
-                        ),
-                        _buildFeaturedCard(
-                          image: "assets/images/menus/slide/pic3.jpg",
-                          category: "Tea",
-                          name: "Iced Lemon Tea Fresh",
-                          price: "\$4.0",
-                          rating: 4.2,
-                        ),
-                      ],
-                    ),
+                    child: _featured.isEmpty
+                        ? const Center(child: CircularProgressIndicator())
+                        : ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: _featured.length,
+                            itemBuilder: (context, index) {
+                              final p = _featured[index];
+                              return _buildFeaturedCard(product: p);
+                            },
+                          ),
                   ),
                 ],
               ),
@@ -321,7 +358,7 @@ class _MainPageState extends State<MainPage> {
       }
     }
     return Image.asset(
-      'assets/images/profile/avatar1.jpg',
+      'assets/images/avatar/5.jpg',
       height: 45,
       width: 45,
       fit: BoxFit.cover,
@@ -499,19 +536,13 @@ class _MainPageState extends State<MainPage> {
   }
 
   // ===== FEATURED CARD =====
-  Widget _buildFeaturedCard({
-    required String image,
-    required String category,
-    required String name,
-    required String price,
-    required double rating,
-  }) {
+  Widget _buildFeaturedCard({required Product product}) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const DetailPage()),
+          MaterialPageRoute(builder: (context) => DetailPage(product: product)),
         );
       },
       child: Container(
@@ -538,12 +569,19 @@ class _MainPageState extends State<MainPage> {
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(16),
                   ),
-                  child: Image.asset(
-                    image,
-                    height: 100,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  child: product.imageUrl.isNotEmpty
+                      ? Image.network(
+                          product.imageUrl,
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          'assets/images/menus/slide/pic1.jpg',
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(10),
@@ -551,7 +589,7 @@ class _MainPageState extends State<MainPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        category,
+                        product.category,
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
@@ -560,7 +598,7 @@ class _MainPageState extends State<MainPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        name,
+                        product.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -582,7 +620,7 @@ class _MainPageState extends State<MainPage> {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                rating.toStringAsFixed(1),
+                                '4.5',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.black87,
@@ -591,7 +629,7 @@ class _MainPageState extends State<MainPage> {
                             ],
                           ),
                           Text(
-                            price,
+                            '\$${product.price.toStringAsFixed(1)}',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,

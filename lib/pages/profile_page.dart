@@ -4,6 +4,8 @@ import 'package:project_kuliah_mwsp_uts_kel4/components/sidebar.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/messages_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/detail_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/store_locations_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/user_service.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/models/product.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -16,6 +18,9 @@ class _ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   late AnimationController _rotateController;
   bool showCallSection = false;
+  String _username = 'Loading...';
+  String _email = 'Loading...';
+  final UserService _userService = UserService();
 
   @override
   void initState() {
@@ -24,6 +29,16 @@ class _ProfilePageState extends State<ProfilePage>
       vsync: this,
       duration: const Duration(seconds: 10),
     )..repeat();
+    _loadUsername();
+  }
+
+  Future<void> _loadUsername() async {
+    final username = await _userService.getUsername();
+    final email = await _userService.getEmail();
+    setState(() {
+      _username = username ?? 'Guest';
+      _email = email ?? 'No email';
+    });
   }
 
   @override
@@ -143,9 +158,9 @@ class _ProfilePageState extends State<ProfilePage>
               ),
 
               const SizedBox(height: 50),
-              const Text(
-                "Kevin Hard",
-                style: TextStyle(
+              Text(
+                _username,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
@@ -282,7 +297,7 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  // 🔹 Favourite Menu Section
+  // 🔹 Profile Info Section
   Widget _buildFavouriteMenus(BuildContext context) {
     return Container(
       key: const ValueKey('favourite'),
@@ -299,31 +314,405 @@ class _ProfilePageState extends State<ProfilePage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Favourite Menus",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Profile Information",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+                IconButton(
+                  onPressed: () => _showEditProfileDialog(context),
+                  icon: const Icon(
+                    Icons.edit,
+                    color: Color(0xFF4A3749),
+                    size: 22,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            _buildInfoCard(
+              icon: Icons.person_outline,
+              label: "Username",
+              value: _username,
             ),
             const SizedBox(height: 15),
-            _menuItem(
-              context: context,
-              image: "assets/images/menus/list/pic1.jpg",
-              title: "Brewed Coppuccino Latte with Creamy Milk",
-              category: "Food",
-              price: "\$5.8",
-              rating: "4.0",
+            _buildInfoCard(
+              icon: Icons.email_outlined,
+              label: "Email",
+              value: _email,
             ),
-            const SizedBox(height: 15),
-            _menuItem(
-              context: context,
-              image: "assets/images/menus/list/pic2.jpg",
-              title: "Melted Omelette with Spicy Chilli",
-              category: "Food",
-              price: "\$8.2",
-              rating: "4.0",
-            ),
+            const SizedBox(height: 30),
           ],
         ),
       ),
+    );
+  }
+
+  // 🔹 Info Card Widget
+  Widget _buildInfoCard({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 5,
+            spreadRadius: 1,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4A3749).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: const Color(0xFF4A3749), size: 24),
+          ),
+          const SizedBox(width: 15),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 🔹 Edit Profile Dialog
+  void _showEditProfileDialog(BuildContext context) {
+    final usernameController = TextEditingController(text: _username);
+    final emailController = TextEditingController(text: _email);
+    final passwordController = TextEditingController();
+    final confirmPasswordController = TextEditingController();
+    bool obscurePassword = true;
+    bool obscureConfirm = true;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return SingleChildScrollView(
+                padding: EdgeInsets.only(bottom: bottomInset + 16),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Edit Profile",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4A3749),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: usernameController,
+                        decoration: InputDecoration(
+                          labelText: "Username",
+                          prefixIcon: const Icon(Icons.person_outline),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF4A3749),
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          labelText: "Email",
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF4A3749),
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: passwordController,
+                        obscureText: obscurePassword,
+                        decoration: InputDecoration(
+                          labelText: "Password (Optional)",
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                obscurePassword = !obscurePassword;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF4A3749),
+                              width: 2,
+                            ),
+                          ),
+                          hintText: "Leave empty to keep current password",
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: confirmPasswordController,
+                        obscureText: obscureConfirm,
+                        decoration: InputDecoration(
+                          labelText: "Confirm Password",
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              obscureConfirm
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                obscureConfirm = !obscureConfirm;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF4A3749),
+                              width: 2,
+                            ),
+                          ),
+                          hintText: "Required only if changing your password",
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                side: const BorderSide(
+                                  color: Color(0xFF4A3749),
+                                ),
+                              ),
+                              child: const Text(
+                                "Cancel",
+                                style: TextStyle(
+                                  color: Color(0xFF4A3749),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                print('=== PROFILE UPDATE STARTED ===');
+                                // Show loading
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Color(0xFF4A3749),
+                                      ),
+                                    );
+                                  },
+                                );
+
+                                try {
+                                  // Validate password confirmation when provided
+                                  if (passwordController.text.isNotEmpty &&
+                                      passwordController.text !=
+                                          confirmPasswordController.text) {
+                                    // Close loading dialog
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          'Password confirmation does not match.',
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  // Get user ID
+                                  final userId = await _userService.getUserId();
+                                  print('Retrieved userId: $userId');
+
+                                  if (userId != null && userId.isNotEmpty) {
+                                    print('Calling updateUser API...');
+                                    // Update via backend API
+                                    await _userService.updateUser(
+                                      userId: userId,
+                                      username: usernameController.text,
+                                      email: emailController.text,
+                                      password:
+                                          passwordController.text.isNotEmpty
+                                          ? passwordController.text
+                                          : null,
+                                    );
+                                    print('API call completed');
+                                  } else {
+                                    print(
+                                      'No userId found, saving locally only',
+                                    );
+                                    // If no userId, just save locally
+                                    await _userService.saveUserData(
+                                      username: usernameController.text,
+                                      email: emailController.text,
+                                    );
+                                  }
+
+                                  // Update state
+                                  setState(() {
+                                    _username = usernameController.text;
+                                    _email = emailController.text;
+                                  });
+
+                                  // Close loading dialog
+                                  Navigator.pop(context);
+                                  // Close edit dialog
+                                  Navigator.pop(context);
+
+                                  // Show success message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Profile updated successfully!',
+                                      ),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                } catch (e) {
+                                  print('ERROR: $e');
+                                  // Close loading dialog
+                                  Navigator.pop(context);
+
+                                  // Show error message
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Failed to update profile: $e',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF4A3749),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: const Text(
+                                "Save",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
@@ -406,9 +795,18 @@ class _ProfilePageState extends State<ProfilePage>
   }) {
     return GestureDetector(
       onTap: () {
+        final p = Product(
+          id: '-',
+          name: title,
+          description: '',
+          category: category,
+          price:
+              double.tryParse(price.replaceAll(RegExp(r'[^0-9\.]'), '')) ?? 0.0,
+          imageUrl: '',
+        );
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const DetailPage()),
+          MaterialPageRoute(builder: (context) => DetailPage(product: p)),
         );
       },
       child: Container(
