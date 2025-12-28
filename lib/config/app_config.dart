@@ -1,0 +1,19 @@
+class AppConfig {
+  // Emulator Android
+  static const String baseUrl = 'http://10.0.2.2:8000/api';
+
+  // Alamat HP fisik
+  // static const String baseUrl = 'http://192.168.1.10:8000/api';
+
+  // ===== AUTH =====
+  static const String register = '/register';
+  static const String login = '/login';
+  static const String logout = '/logout';
+  static const String getUser = '/get-user';
+
+  // ===== EDIT PROFILE PAGE =====
+  static const updateProfile = '/user/profile';
+
+  // ===== PRODUK (NANTI) =====
+  static const String products = '/products';
+}
