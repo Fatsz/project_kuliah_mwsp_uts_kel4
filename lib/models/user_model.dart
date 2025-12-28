@@ -2,8 +2,8 @@ class UserModel {
   final int id;
   final String username;
   final String email;
-  final String? address;
-  final String? profilePhotoUrl;
+  final String? alamat;
+  final String? gambarUrl;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -11,8 +11,8 @@ class UserModel {
     required this.id,
     required this.username,
     required this.email,
-    this.address,
-    this.profilePhotoUrl,
+    this.alamat,
+    this.gambarUrl,
     this.createdAt,
     this.updatedAt,
   });
@@ -22,8 +22,8 @@ class UserModel {
       id: json['id'] ?? 0,
       username: json['username'] ?? '',
       email: json['email'] ?? '',
-      address: json['address'],
-      profilePhotoUrl: json['profile_photo_url'],
+      alamat: json['alamat'],
+      gambarUrl: json['gambar_url'],
       createdAt: json['created_at'] != null
           ? DateTime.parse(json['created_at'])
           : null,
@@ -38,8 +38,8 @@ class UserModel {
       'id': id,
       'username': username,
       'email': email,
-      'address': address,
-      'profile_photo_url': profilePhotoUrl,
+      'alamat': alamat,
+      'gambar_url': gambarUrl,
       'created_at': createdAt?.toIso8601String(),
       'updated_at': updatedAt?.toIso8601String(),
     };
@@ -47,19 +47,19 @@ class UserModel {
 
   UserModel copyWith({
     int? id,
-    String? name,
+    String? username,
     String? email,
-    String? address,
-    String? profilePhotoUrl,
+    String? alamat,
+    String? gambarUrl,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
     return UserModel(
       id: id ?? this.id,
-      username: name ?? this.username,
+      username: username ?? this.username,
       email: email ?? this.email,
-      address: address ?? this.address,
-      profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,
+      alamat: alamat ?? this.alamat,
+      gambarUrl: gambarUrl ?? this.gambarUrl,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
