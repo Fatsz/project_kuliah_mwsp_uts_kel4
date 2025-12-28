@@ -1,6 +1,6 @@
 class UserModel {
   final int id;
-  final String name;
+  final String username;
   final String email;
   final String? address;
   final String? profilePhotoUrl;
@@ -9,7 +9,7 @@ class UserModel {
 
   UserModel({
     required this.id,
-    required this.name,
+    required this.username,
     required this.email,
     this.address,
     this.profilePhotoUrl,
@@ -20,7 +20,7 @@ class UserModel {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'] ?? 0,
-      name: json['name'] ?? '',
+      username: json['username'] ?? '',
       email: json['email'] ?? '',
       address: json['address'],
       profilePhotoUrl: json['profile_photo_url'],
@@ -36,7 +36,7 @@ class UserModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'username': username,
       'email': email,
       'address': address,
       'profile_photo_url': profilePhotoUrl,
@@ -45,7 +45,6 @@ class UserModel {
     };
   }
 
-  // Helper method untuk membuat copy dengan perubahan
   UserModel copyWith({
     int? id,
     String? name,
@@ -57,7 +56,7 @@ class UserModel {
   }) {
     return UserModel(
       id: id ?? this.id,
-      name: name ?? this.name,
+      username: name ?? this.username,
       email: email ?? this.email,
       address: address ?? this.address,
       profilePhotoUrl: profilePhotoUrl ?? this.profilePhotoUrl,

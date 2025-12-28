@@ -8,14 +8,14 @@ class AuthService {
   // ================= REGISTER =================
   // Register lalu AUTO LOGIN
   Future<Map<String, dynamic>> register({
-    required String name,
+    required String username,
     required String email,
     required String password,
   }) async {
     try {
       final response = await _apiService.post(
         AppConfig.register,
-        body: {'name': name, 'email': email, 'password': password},
+        body: {'username': username, 'email': email, 'password': password},
         needsAuth: false,
       );
 
@@ -93,12 +93,12 @@ class AuthService {
 
   // ================= UPDATE PROFILE =================
   Future<Map<String, dynamic>> updateProfile({
-    required String name,
+    required String username,
     String? address,
     String? profilePhotoUrl,
   }) async {
     try {
-      Map<String, dynamic> body = {'name': name};
+      Map<String, dynamic> body = {'username': username};
 
       if (address != null && address.isNotEmpty) {
         body['address'] = address;
