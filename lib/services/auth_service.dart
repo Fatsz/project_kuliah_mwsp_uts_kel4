@@ -94,18 +94,18 @@ class AuthService {
   // ================= UPDATE PROFILE =================
   Future<Map<String, dynamic>> updateProfile({
     required String username,
-    String? address,
-    String? profilePhotoUrl,
+    String? alamat,
+    String? gambarUrl,
   }) async {
     try {
       Map<String, dynamic> body = {'username': username};
 
-      if (address != null && address.isNotEmpty) {
-        body['address'] = address;
+      if (alamat != null && alamat.isNotEmpty) {
+        body['alamat'] = alamat;
       }
 
-      if (profilePhotoUrl != null && profilePhotoUrl.isNotEmpty) {
-        body['profile_photo_url'] = profilePhotoUrl;
+      if (gambarUrl != null && gambarUrl.isNotEmpty) {
+        body['gambar_url'] = gambarUrl;
       }
 
       final response = await _apiService.put(
@@ -118,7 +118,6 @@ class AuthService {
 
       if (response.statusCode == 200 && data['status'] == 'success') {
         final updatedUser = UserModel.fromJson(data['user']);
-
         return {'success': true, 'user': updatedUser};
       }
 
