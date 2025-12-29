@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'forget_pass_screen.dart';
 import 'register_form_screen.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/main_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/cart_service.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -58,21 +60,24 @@ class _LoginScreenState extends State<LoginScreen>
   Future<void> _login() async {
     setState(() => _isLoading = true);
 
-    final url = Uri.parse("http://10.0.2.2:8000/api/login");
-
     try {
-      final response = await http.post(
-        url,
-        body: {
-          'email': _emailController.text.trim(),
-          'password': _passwordController.text.trim(),
-        },
+      final authService = AuthService();
+      
+      // Use AuthService to login (this will save the token)
+      final result = await authService.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
 
-      final data = jsonDecode(response.body);
-
-      if (response.statusCode == 200 && data["status"] == "success") {
+      if (result['success'] == true) {
         // 🟢 Login sukses
+        final user = result['user'];
+        
+        // Set current user in CartService
+        CartService().setCurrentUser(user.id.toString());
+        print('✅ User logged in: ${user.username} (ID: ${user.id})');
+        print('✅ Token saved: ${result['token']}');
+        
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text("Login berhasil!")));
@@ -85,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen>
       } else {
         // 🔴 Error dari API
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(data["message"] ?? "Login gagal")),
+          SnackBar(content: Text(result['message'] ?? "Login gagal")),
         );
       }
     } catch (e) {

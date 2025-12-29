@@ -406,10 +406,11 @@ class _ProfilePageState extends State<ProfilePage>
   }) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DetailPage()),
-        );
+        // TODO: Favorite menu items need to be converted to ProductModel to navigate to DetailPage
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => DetailPage(product: product)),
+        // );
       },
       child: Container(
         padding: const EdgeInsets.all(10),
