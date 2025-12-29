@@ -8,14 +8,14 @@ class AuthService {
   // ================= REGISTER =================
   // Register lalu AUTO LOGIN
   Future<Map<String, dynamic>> register({
-    required String name,
+    required String username,
     required String email,
     required String password,
   }) async {
     try {
       final response = await _apiService.post(
         AppConfig.register,
-        body: {'name': name, 'email': email, 'password': password},
+        body: {'username': username, 'email': email, 'password': password},
         needsAuth: false,
       );
 
@@ -93,19 +93,19 @@ class AuthService {
 
   // ================= UPDATE PROFILE =================
   Future<Map<String, dynamic>> updateProfile({
-    required String name,
-    String? address,
-    String? profilePhotoUrl,
+    required String username,
+    String? alamat,
+    String? gambarUrl,
   }) async {
     try {
-      Map<String, dynamic> body = {'name': name};
+      Map<String, dynamic> body = {'username': username};
 
-      if (address != null && address.isNotEmpty) {
-        body['address'] = address;
+      if (alamat != null && alamat.isNotEmpty) {
+        body['alamat'] = alamat;
       }
 
-      if (profilePhotoUrl != null && profilePhotoUrl.isNotEmpty) {
-        body['profile_photo_url'] = profilePhotoUrl;
+      if (gambarUrl != null && gambarUrl.isNotEmpty) {
+        body['gambar_url'] = gambarUrl;
       }
 
       final response = await _apiService.put(
@@ -118,7 +118,6 @@ class AuthService {
 
       if (response.statusCode == 200 && data['status'] == 'success') {
         final updatedUser = UserModel.fromJson(data['user']);
-
         return {'success': true, 'user': updatedUser};
       }
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'login_form_screen.dart';
 
 class ForgetPassScreen extends StatefulWidget {
@@ -10,8 +12,8 @@ class ForgetPassScreen extends StatefulWidget {
 
 class _ForgetPassScreenState extends State<ForgetPassScreen>
     with SingleTickerProviderStateMixin {
-  final TextEditingController _passwordController = TextEditingController();
-  bool _obscurePassword = true;
+  final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
 
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
@@ -33,14 +35,64 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
   @override
   void dispose() {
     _controller.dispose();
-    _passwordController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
-  void _togglePassword() {
-    setState(() {
-      _obscurePassword = !_obscurePassword;
-    });
+  Future<void> _submit() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      _showMessage("Email tidak boleh kosong");
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://192.168.18.59:8000/api/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email}),
+      );
+
+      String message;
+
+      // Cek apakah response body kosong atau tidak valid JSON
+      if (response.body.isNotEmpty) {
+        try {
+          final data = jsonDecode(response.body);
+          message = data['message'] ?? "Terjadi kesalahan";
+        } catch (_) {
+          message = "Terjadi kesalahan saat memproses response server";
+        }
+      } else {
+        message = response.statusCode == 200
+            ? "Link reset password telah dikirim ke email Anda"
+            : "Terjadi kesalahan, coba lagi nanti";
+      }
+
+      _showMessage(message);
+    } catch (e) {
+      _showMessage("Terjadi kesalahan: $e");
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _showMessage(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Info"),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -81,32 +133,25 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+                        "Masukkan email akun Anda untuk menerima link reset password.",
                         style: TextStyle(color: Colors.black87),
                       ),
                       const SizedBox(height: 24),
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Password',
+                          'Email',
                           style: TextStyle(fontSize: 14, color: Colors.black54),
                         ),
                       ),
                       const SizedBox(height: 10),
                       TextField(
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          hintText: 'Password',
-                          hintStyle: TextStyle(color: Color.fromRGBO(74, 55, 73, 0.5)),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              color: const Color.fromRGBO(74, 55, 73, 1),
-                            ),
-                            onPressed: _togglePassword,
+                          hintText: 'Email',
+                          hintStyle: const TextStyle(
+                            color: Color.fromRGBO(74, 55, 73, 0.5),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
@@ -115,9 +160,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: _isLoading ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                           backgroundColor: const Color.fromRGBO(74, 55, 73, 1),
@@ -125,18 +168,20 @@ class _ForgetPassScreenState extends State<ForgetPassScreen>
                             borderRadius: BorderRadius.circular(22),
                           ),
                         ),
-                        child: const Text(
-                          "SUBMIT",
-                          style: TextStyle(
-                            fontSize: 16,
-                            letterSpacing: 1.5,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                "SUBMIT",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  letterSpacing: 1.5,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                       const SizedBox(height: 20),
-
-                      // Teks informasi dan navigasi
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
