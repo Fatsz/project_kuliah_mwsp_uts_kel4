@@ -341,7 +341,7 @@ class WishlistItemCard extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              'Rp ${product.harga}',
+              '\$ ${product.harga}',
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
