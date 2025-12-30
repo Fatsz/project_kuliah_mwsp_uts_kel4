@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/components/sidebar.dart';
-import 'package:project_kuliah_mwsp_uts_kel4/pages/detail_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/cart_service.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/models/cart_item_model.dart';
 import 'checkout_page.dart';
 
 class CartPage extends StatefulWidget {
@@ -12,85 +14,45 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
   late TabController _tabController;
-  final TextEditingController _searchController = TextEditingController();
-
-  List<Map<String, dynamic>> allItems = [
-    {
-      "title": "Hot Sweet Indonesian Tea",
-      "price": 5.8,
-      "qty": 2,
-      "image": "assets/images/cart/pic1.jpg",
-      "status": "all",
-    },
-    {
-      "title": "Mocha Coffee Creamy Milky",
-      "price": 8.6,
-      "qty": 1,
-      "image": "assets/images/cart/pic2.jpg",
-      "status": "all",
-    },
-    {
-      "title": "Hot Sweet Indonesian Tea",
-      "price": 5.8,
-      "qty": 2,
-      "image": "assets/images/cart/pic3.jpg",
-      "status": "all",
-    },
-    {
-      "title": "Caramel Latte Classic",
-      "price": 7.5,
-      "qty": 1,
-      "image": "assets/images/cart/pic4.jpg",
-      "status": "all",
-    },
-    {
-      "title": "Espresso Bold Roast",
-      "price": 6.2,
-      "qty": 1,
-      "image": "assets/images/cart/pic1.jpg",
-      "status": "delivery",
-    },
-    {
-      "title": "Cold Brew Signature",
-      "price": 8.4,
-      "qty": 2,
-      "image": "assets/images/cart/pic2.jpg",
-      "status": "delivery",
-    },
-    {
-      "title": "Matcha Latte Creamy",
-      "price": 9.8,
-      "qty": 1,
-      "image": "assets/images/cart/pic3.jpg",
-      "status": "done",
-    },
-    {
-      "title": "Hazelnut Iced Coffee",
-      "price": 10.2,
-      "qty": 1,
-      "image": "assets/images/cart/pic4.jpg",
-      "status": "done",
-    },
-  ];
-
-  String searchQuery = "";
+  final CartService _cartService = CartService();
+  final NumberFormat _currencyFormat = NumberFormat.currency(
+    locale: 'en_US',
+    symbol: '\$',
+    decimalDigits: 2,
+  );
+  
+  bool _isLoading = false;
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _loadCart();
+  }
+  
+  // Load cart from backend
+  Future<void> _loadCart() async {
+    setState(() => _isLoading = true);
+    await _cartService.loadCartFromBackend();
+    setState(() => _isLoading = false);
   }
 
-  List<Map<String, dynamic>> getFilteredItems(String status) {
-    return allItems.where((item) {
-      bool matchesSearch = item["title"].toString().toLowerCase().contains(
-        searchQuery.toLowerCase(),
-      );
-      bool matchesTab = status == "all"
-          ? item["status"] == "all"
-          : item["status"] == status;
-      return matchesSearch && matchesTab;
-    }).toList();
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  // Filter cart items by status
+  List<CartItemModel> _getFilteredItems(String status) {
+    final allItems = _cartService.getCartItems();
+    if (status == 'all') {
+      return allItems.where((item) => item.status == 'all').toList();
+    } else if (status == 'delivery') {
+      return allItems.where((item) => item.status == 'delivery').toList();
+    } else {
+      return allItems.where((item) => item.status == 'done').toList();
+    }
   }
 
   @override
@@ -134,31 +96,11 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
           ),
         ),
       ),
-
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: "Search Order ID or Product",
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: const Color(0xfff5f5f5),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 0,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              onChanged: (val) => setState(() => searchQuery = val),
-            ),
-          ),
+          const SizedBox(height: 16),
 
+          // Tab Bar
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
@@ -189,19 +131,19 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
 
           const SizedBox(height: 10),
 
+          // Tab Bar View
           Expanded(
             child: TabBarView(
               controller: _tabController,
               children: [
-                buildCartListWithNote("all"),
-                buildCartListWithNote("delivery"),
-                buildCartListWithNote("done"),
+                _buildCartList('all'),
+                _buildCartList('delivery'),
+                _buildCartList('done'),
               ],
             ),
           ),
         ],
       ),
-
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton(
@@ -220,158 +162,209 @@ class _CartPageState extends State<CartPage> with TickerProviderStateMixin {
           ),
           child: const Text(
             "PLACE ORDER",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget buildCartListWithNote(String status) {
-    var items = getFilteredItems(status);
+  Widget _buildCartList(String status) {
+    final cartItems = _getFilteredItems(status);
 
-    if (items.isEmpty) {
-      return const Center(child: Text("Nothing found"));
+    if (cartItems.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.shopping_cart_outlined,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              status == 'all'
+                  ? 'No items in cart'
+                  : status == 'delivery'
+                      ? 'No items in delivery'
+                      : 'No completed orders',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      );
     }
 
     return ListView.separated(
-      itemCount: items.length + 1,
-      separatorBuilder: (context, index) => index < items.length
-          ? const Divider(color: Color(0xFFE0E0E0), height: 1)
-          : const SizedBox.shrink(),
+      itemCount: cartItems.length,
+      separatorBuilder: (context, index) => const Divider(
+        color: Color(0xFFE0E0E0),
+        height: 1,
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemBuilder: (context, index) {
-        if (index == items.length) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8, left: 4),
-            child: RichText(
-              text: const TextSpan(
-                children: [
-                  TextSpan(
-                    text: "Note: ",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  TextSpan(
-                    text: "Swipe to delete Cart Items",
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
+        final cartItem = cartItems[index];
+        return _buildCartItem(cartItem);
+      },
+    );
+  }
 
-        final item = items[index];
-        return Dismissible(
-          key: Key(item["title"]),
-          direction: DismissDirection.endToStart,
-          onDismissed: (_) {
-            setState(() {
-              allItems.remove(item);
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("${item['title']} removed from cart")),
-            );
-          },
-          background: Container(
-            margin: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.redAccent,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20),
-            child: const Icon(Icons.delete, color: Colors.white),
-          ),
-          child: GestureDetector(
-            onTap: () {
-              // 👇 Navigasi ke halaman Detail
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const DetailPage()),
-              );
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 10),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 6,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.asset(
-                      item["image"],
-                      width: 95,
-                      height: 95,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  const SizedBox(width: 18),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item["title"],
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "\$${item["price"]}",
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 15,
-                              ),
-                            ),
-                            Text(
-                              "${item["qty"]}x",
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 15,
-                              ),
-                            ),
-                            Text(
-                              "\$${(item["price"] * item["qty"]).toStringAsFixed(1)}",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+  Widget _buildCartItem(CartItemModel cartItem) {
+    final product = cartItem.product;
+    final itemTotal = cartItem.totalPrice;
+
+    return Dismissible(
+      key: Key(cartItem.id),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) async {
+        await _cartService.removeFromCart(cartItem.id);
+        setState(() {});
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${product.nama} removed from cart'),
+            duration: const Duration(seconds: 2),
           ),
         );
       },
+      background: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: Colors.redAccent,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Product image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: product.gambarUrl != null && product.gambarUrl!.isNotEmpty
+                  ? Image.network(
+                      product.gambarUrl!,
+                      width: 95,
+                      height: 95,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 95,
+                          height: 95,
+                          color: Colors.grey[300],
+                          child: const Icon(
+                            Icons.image_not_supported,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    )
+                  : Container(
+                      width: 95,
+                      height: 95,
+                      color: Colors.grey[300],
+                      child: const Icon(
+                        Icons.fastfood,
+                        color: Colors.grey,
+                      ),
+                    ),
+            ),
+            const SizedBox(width: 18),
+
+            // Product details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.nama,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  // Size badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFEBDA),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'Size: ${cartItem.size}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF4A3749),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _currencyFormat.format(product.harga),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        '${cartItem.quantity}x',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        _currencyFormat.format(itemTotal),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Color(0xFF4A3749),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

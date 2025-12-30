@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/auth_service.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/screen/login_form_screen.dart';
 
 class RegisterFormScreen extends StatefulWidget {
@@ -48,19 +49,51 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
     });
   }
 
+  // === REGISTER ACTION ===
+  void _registerAction() async {
+    final username = _usernameController.text.trim();
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Username, Email dan Password wajib diisi!"),
+        ),
+      );
+      return;
+    }
+
+    final authService = AuthService();
+    final result = await authService.register(
+      username: username,
+      email: email,
+      password: password,
+    );
+
+    if (result['success']) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Registrasi berhasil! Silakan login.")),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message'] ?? "Gagal register")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.3),
       body: Stack(
         children: [
-          // Background gelap transparan — klik di luar popup untuk menutup
           GestureDetector(
             onTap: () => Navigator.pop(context),
             child: Container(color: const Color.fromRGBO(74, 55, 73, 1)),
           ),
 
-          // Popup Form Register
           Align(
             alignment: Alignment.bottomCenter,
             child: SlideTransition(
@@ -76,10 +109,9 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Judul
-                      Align(
+                      const Align(
                         alignment: Alignment.centerLeft,
-                        child: const Text(
+                        child: Text(
                           "Sign Up",
                           style: TextStyle(
                             fontSize: 28,
@@ -90,68 +122,29 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+                        "Buat akunmu untuk masuk ke aplikasi",
                         textAlign: TextAlign.left,
                         style: TextStyle(fontSize: 14, color: Colors.black87),
                       ),
                       const SizedBox(height: 24),
 
                       // Username
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: const Text(
-                          'Username',
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: _usernameController,
-                        decoration: InputDecoration(
-                          hintText: 'Roberto Karlos',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                        ),
-                      ),
+                      _label("Username"),
+                      _input(_usernameController, "Username kamu"),
                       const SizedBox(height: 16),
 
                       // Email
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: const Text(
-                          'Email',
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      TextField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          hintText: 'Email Address',
-                          hintStyle: TextStyle(color: Color.fromRGBO(74, 55, 73, 0.5)),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                        ),
-                      ),
+                      _label("Email"),
+                      _input(_emailController, "Email kamu"),
                       const SizedBox(height: 16),
 
                       // Password
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: const Text(
-                          'Password',
-                          style: TextStyle(fontSize: 14, color: Colors.black54),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
+                      _label("Password"),
                       TextField(
                         controller: _passwordController,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           hintText: 'Password',
-                          hintStyle: TextStyle(color: Color.fromRGBO(74, 55, 73, 0.5)),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -166,13 +159,12 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 24),
 
-                      // Tombol REGISTER
+                      // REGISTER BUTTON
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: _registerAction,
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                           backgroundColor: const Color.fromRGBO(74, 55, 73, 1),
@@ -191,14 +183,12 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
                       ),
                       const SizedBox(height: 20),
 
-                      // Sudah punya akun?
                       const Text(
                         "Already have an account?",
                         style: TextStyle(color: Colors.grey),
                       ),
                       const SizedBox(height: 6),
 
-                      // Tombol Sign In
                       ElevatedButton(
                         onPressed: () {
                           Navigator.pop(context);
@@ -215,7 +205,12 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
-                          backgroundColor: Color.fromRGBO(229, 229, 229, 1),
+                          backgroundColor: const Color.fromRGBO(
+                            229,
+                            229,
+                            229,
+                            1,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(22),
                           ),
@@ -234,6 +229,27 @@ class _RegisterFormScreenState extends State<RegisterFormScreen>
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // === Reusable UI Helpers ===
+  Widget _label(String text) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 14, color: Colors.black54),
+      ),
+    );
+  }
+
+  Widget _input(TextEditingController controller, String hint) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        hintText: hint,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(22)),
       ),
     );
   }

@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 import 'forget_pass_screen.dart';
 import 'register_form_screen.dart';
-// import 'package:project_kuliah_mwsp_uts_kel4/dummy/main_page_dummy.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/main_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/cart_service.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen>
   final TextEditingController _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
@@ -49,6 +54,58 @@ class _LoginScreenState extends State<LoginScreen>
     });
   }
 
+  // ==========================================
+  // 🚀 LOGIN FUNCTION
+  // ==========================================
+  Future<void> _login() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = AuthService();
+      
+      // Use AuthService to login (this will save the token)
+      final result = await authService.login(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (result['success'] == true) {
+        // 🟢 Login sukses
+        final user = result['user'];
+        
+        // Set current user in CartService
+        CartService().setCurrentUser(user.id.toString());
+        print('✅ User logged in: ${user.username} (ID: ${user.id})');
+        print('✅ Token saved: ${result['token']}');
+        
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Login berhasil!")));
+
+        // pindah ke MainPage
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainPage()),
+        );
+      } else {
+        // 🔴 Error dari API
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message'] ?? "Login gagal")),
+        );
+      }
+    } catch (e) {
+      // 🔴 Error dari sisi aplikasi / jaringan
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  // ==========================================
+  // UI — tidak ada yang diubah
+  // ==========================================
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,11 +150,10 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 24),
 
-                      // Username
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Username',
+                          'Email',
                           style: TextStyle(fontSize: 14, color: Colors.black54),
                         ),
                       ),
@@ -116,7 +172,6 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 16),
 
-                      // Password
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
@@ -130,9 +185,6 @@ class _LoginScreenState extends State<LoginScreen>
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
                           hintText: 'Password',
-                          hintStyle: const TextStyle(
-                            color: Color.fromRGBO(74, 55, 73, 0.5),
-                          ),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -149,16 +201,9 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 24),
 
-                      // Tombol LOGIN menuju MainPageDummy
+                      // ========== LOGIN BUTTON (DIUBAH) ==========
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MainPage(),
-                            ),
-                          );
-                        },
+                        onPressed: _isLoading ? null : _login,
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size(double.infinity, 50),
                           backgroundColor: const Color.fromRGBO(74, 55, 73, 1),
@@ -166,14 +211,18 @@ class _LoginScreenState extends State<LoginScreen>
                             borderRadius: BorderRadius.circular(22),
                           ),
                         ),
-                        child: const Text(
-                          "LOGIN",
-                          style: TextStyle(
-                            fontSize: 16,
-                            letterSpacing: 1.5,
-                            color: Colors.white,
-                          ),
-                        ),
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text(
+                                "LOGIN",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  letterSpacing: 1.5,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
 
                       const SizedBox(height: 10),
@@ -224,7 +273,6 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                       const SizedBox(height: 30),
 
-                      // Sosial media login
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

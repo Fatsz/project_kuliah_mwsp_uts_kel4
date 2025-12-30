@@ -6,6 +6,11 @@ import 'package:project_kuliah_mwsp_uts_kel4/pages/detail_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/cart_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/product_page.dart';
 import 'package:project_kuliah_mwsp_uts_kel4/pages/notifications_page.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/product_service.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/auth_service.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/services/cart_service.dart';
+import 'package:project_kuliah_mwsp_uts_kel4/models/product_model.dart';
+import 'package:intl/intl.dart';
 
 class MainPage extends StatefulWidget {
   final String? profileImagePath;
@@ -23,6 +28,71 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
+  final ProductService _productService = ProductService();
+  final NumberFormat _currencyFmt = NumberFormat.currency(
+    locale: 'en_US',
+    symbol: '\$',
+  );
+
+  bool _featuredLoading = true;
+  String? _featuredError;
+  List<ProductModel> _featuredProducts = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeUserSession();
+    _loadFeaturedProducts();
+  }
+
+  // Initialize user session in CartService
+  Future<void> _initializeUserSession() async {
+    // Check if user is already set (from login)
+    if (CartService().currentUserId != null) {
+      print('✅ User session already initialized (ID: ${CartService().currentUserId})');
+      // Load cart from backend
+      await CartService().loadCartFromBackend();
+      return;
+    }
+
+    // Try to get user info from AuthService
+    final authService = AuthService();
+    final userInfo = await authService.getUserInfo();
+    
+    if (userInfo['success'] == true) {
+      final user = userInfo['user'];
+      // Set current user in CartService using user ID
+      CartService().setCurrentUser(user.id.toString());
+      print('✅ User session initialized from AuthService: ${user.username} (ID: ${user.id})');
+      
+      // Load cart from backend
+      await CartService().loadCartFromBackend();
+    } else {
+      print('⚠️ No user session found');
+      CartService().setCurrentUser(null);
+    }
+  }
+
+  Future<void> _loadFeaturedProducts() async {
+    setState(() {
+      _featuredLoading = true;
+      _featuredError = null;
+    });
+
+    final result = await _productService.getFeaturedProducts(limit: 8);
+    if (mounted) {
+      setState(() {
+        if (result['success'] == true) {
+          _featuredProducts = (result['products'] as List<ProductModel>);
+          _featuredLoading = false;
+        } else {
+          _featuredError = (result['message'] ?? 'Gagal memuat produk')
+              .toString();
+          _featuredLoading = false;
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +306,7 @@ class _MainPageState extends State<MainPage> {
 
                   // ===== FEATURED BEVERAGES =====
                   const Text(
-                    "Featured Beverages",
+                    "Featured Products",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -247,33 +317,31 @@ class _MainPageState extends State<MainPage> {
 
                   SizedBox(
                     height: 240,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                        _buildFeaturedCard(
-                          image: "assets/images/menus/slide/pic1.jpg",
-                          category: "Tea",
-                          name: "Hot Sweet Indonesian Tea",
-                          price: "\$5.8",
-                          rating: 4.0,
-                        ),
-                        _buildFeaturedCard(
-                          image: "assets/images/menus/slide/pic2.jpg",
-                          category: "Coffee",
-                          name: "Mocha Coffee Creamy Milky",
-                          price: "\$6.2",
-                          rating: 4.5,
-                        ),
-                        _buildFeaturedCard(
-                          image: "assets/images/menus/slide/pic3.jpg",
-                          category: "Tea",
-                          name: "Iced Lemon Tea Fresh",
-                          price: "\$4.0",
-                          rating: 4.2,
-                        ),
-                      ],
-                    ),
+                    child: _featuredLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : (_featuredError != null)
+                        ? Center(
+                            child: Text(
+                              _featuredError!,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          )
+                        : (_featuredProducts.isEmpty)
+                        ? const Center(
+                            child: Text(
+                              'Belum ada produk',
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                          )
+                        : ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: _featuredProducts.length,
+                            itemBuilder: (context, index) {
+                              final product = _featuredProducts[index];
+                              return _buildFeaturedProductCard(product);
+                            },
+                          ),
                   ),
                 ],
               ),
@@ -509,10 +577,11 @@ class _MainPageState extends State<MainPage> {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const DetailPage()),
-        );
+        // TODO: This hardcoded card needs product data to navigate to DetailPage
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => DetailPage(product: product)),
+        // );
       },
       child: Container(
         width: 160,
@@ -592,6 +661,157 @@ class _MainPageState extends State<MainPage> {
                           ),
                           Text(
                             price,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF4A3749),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            // ===== TOMBOL KERANJANG =====
+            Positioned(
+              top: 80,
+              right: 10,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(15),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CartPage()),
+                    );
+                  },
+                  child: Container(
+                    width: 55,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(
+                      Icons.shopping_bag_outlined,
+                      color: Color(0xFF4A3749),
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ===== FEATURED CARD (from ProductModel) =====
+  Widget _buildFeaturedProductCard(ProductModel product) {
+    final priceStr = _currencyFmt.format(product.harga);
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DetailPage(product: product)),
+        );
+      },
+      child: Container(
+        width: 160,
+        margin: const EdgeInsets.only(right: 15),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child:
+                      product.gambarUrl != null && product.gambarUrl!.isNotEmpty
+                      ? Image.network(
+                          product.gambarUrl!,
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                      : Image.asset(
+                          'assets/images/menus/slide/pic1.jpg',
+                          height: 100,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        product.kategori,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        product.nama,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: const [
+                              Icon(Icons.star, color: Colors.amber, size: 16),
+                              SizedBox(width: 4),
+                              Text(
+                                '4.5',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            priceStr,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
