@@ -1,6 +1,6 @@
 class AppConfig {
   // Emulator Android
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'http://10.0.2.2:8000/api';
 
   // Alamat HP fisik
   // static const String baseUrl = 'http://192.168.0.104:8000/api';
@@ -35,6 +35,6 @@ class AppConfig {
   static String updateKeranjang(int id) => '/keranjang/$id'; // Update quantity
   static String deleteKeranjang(int id) => '/keranjang/$id'; // Remove from cart
 
-  //WISHLIST 
+  //WISHLIST
   static const String wishlist = '$baseUrl/wishlist';
 }
