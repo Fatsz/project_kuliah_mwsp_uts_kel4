@@ -273,7 +273,7 @@ class _DetailPageState extends State<DetailPage> {
                                 const Icon(CupertinoIcons.tag, size: 22),
                                 const SizedBox(width: 6),
                                 Text(
-                                  'Rp ${widget.product.harga.toStringAsFixed(0)}',
+                                  '\$${widget.product.harga.toStringAsFixed(2)}',
                                   style: const TextStyle(
                                     fontSize: 25,
                                     fontWeight: FontWeight.bold,
@@ -394,7 +394,7 @@ class _DetailPageState extends State<DetailPage> {
                                       ),
                                       TextSpan(
                                         text:
-                                            'Rp ${totalPrice.toStringAsFixed(0)}',
+                                            '\$${totalPrice.toStringAsFixed(2)}',
                                         style: const TextStyle(
                                           color: Color(0xFFD3C1E5),
                                           fontWeight: FontWeight.w700,
